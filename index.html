@@ -1,0 +1,2670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Veggie & Fruit Sprout Quest - English Idle Adventure</title>
+  <style>
+    :root {
+      --bg-sky: #dff6ff;
+      --card-bg: #ffffff;
+      --text-dark: #1d3557;
+      --text-muted: #52796f;
+      --accent-melee: #e63946;
+      --accent-ranged: #3a86ff;
+      --accent-gold: #ffb703;
+      --accent-green: #2a9d8f;
+      --border-radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #e0f7fa 0%, #e8f5e9 100%);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+
+    .game-wrapper {
+      width: 100%;
+      max-width: 980px;
+      background: #f8f9fa;
+      border-radius: 24px;
+      box-shadow: 0 16px 40px rgba(29, 53, 87, 0.15);
+      overflow: hidden;
+      border: 4px solid #ffffff;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 16px;
+      position: relative;
+    }
+
+    /* Interactive Start Overlay (Required by Chrome/Edge to unlock Web Speech API & Web Audio API) */
+    .start-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(29, 53, 87, 0.88);
+      backdrop-filter: blur(6px);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      color: #ffffff;
+      gap: 16px;
+    }
+
+    .start-overlay.hidden {
+      display: none;
+    }
+
+    .start-card {
+      background: #ffffff;
+      color: var(--text-dark);
+      padding: 32px 36px;
+      border-radius: 24px;
+      max-width: 480px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+      border: 4px solid var(--accent-gold);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .start-card h2 {
+      font-size: 1.75rem;
+      font-weight: 900;
+      color: var(--text-dark);
+    }
+
+    .start-card p {
+      font-size: 0.98rem;
+      line-height: 1.5;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .start-btn {
+      background: linear-gradient(135deg, #2a9d8f, #52b788);
+      color: #ffffff;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 36px;
+      font-size: 1.2rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(42, 157, 143, 0.4);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 10px 24px rgba(42, 157, 143, 0.55);
+    }
+
+    /* Top HUD Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      padding: 12px 18px;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .title-group h1 {
+      font-size: 1.28rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.5px;
+    }
+
+    .stage-pill {
+      background: var(--accent-green);
+      color: #fff;
+      font-weight: 800;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      box-shadow: 0 2px 8px rgba(42, 157, 143, 0.3);
+    }
+
+    .level-progress-bar {
+      width: 120px;
+      height: 10px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .level-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #2a9d8f, #52b788);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .stats-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .stat-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff8e6;
+      border: 2px solid var(--accent-gold);
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-weight: 800;
+      color: #b4690e;
+      font-size: 0.95rem;
+    }
+
+    .sound-btn {
+      background: #edf2f4;
+      border: 2px solid #cbd5e1;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--text-dark);
+      transition: all 0.15s ease;
+    }
+
+    .sound-btn:hover {
+      background: #e2e8f0;
+    }
+
+    /* Main Battle & Card Split */
+    .main-stage {
+      display: grid;
+      grid-template-columns: 1.55fr 1.05fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 800px) {
+      .main-stage {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Canvas Container */
+    .canvas-container {
+      position: relative;
+      background: var(--bg-sky);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      border: 3px solid #bde0fe;
+      box-shadow: inset 0 4px 12px rgba(0,0,0,0.04);
+      height: 370px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Speech / Spelling Banner inside Canvas */
+    .speech-banner {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.96);
+      border: 3px solid var(--accent-gold);
+      border-radius: 999px;
+      padding: 7px 20px;
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: var(--text-dark);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+      pointer-events: none;
+      white-space: nowrap;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+      opacity: 0;
+      z-index: 5;
+    }
+
+    .speech-banner.active {
+      opacity: 1;
+      transform: translateX(-50%) scale(1.05);
+    }
+
+    .speech-banner .letter-highlight {
+      color: var(--accent-melee);
+      letter-spacing: 2px;
+    }
+
+    /* Interactive Clickable Weapon Warning Alert inside Canvas */
+    .weapon-warning {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ef233c;
+      color: #ffffff;
+      font-weight: 900;
+      padding: 10px 22px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      border: 3px solid #ffffff;
+      box-shadow: 0 6px 20px rgba(239, 35, 60, 0.55);
+      animation: bounceAlert 0.65s infinite alternate;
+      display: none;
+      cursor: pointer;
+      white-space: nowrap;
+      z-index: 10;
+    }
+
+    .weapon-warning:hover {
+      background: #d90429;
+    }
+
+    @keyframes bounceAlert {
+      from { transform: translateX(-50%) translateY(0); }
+      to { transform: translateX(-50%) translateY(-7px); }
+    }
+
+    /* Victory Overlay for Level 20 Cap */
+    .victory-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(29, 53, 87, 0.88);
+      backdrop-filter: blur(4px);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      text-align: center;
+      padding: 24px;
+      z-index: 20;
+      gap: 12px;
+    }
+
+    .victory-overlay.show {
+      display: flex;
+    }
+
+    .victory-overlay h2 {
+      font-size: 2rem;
+      color: #ffd166;
+    }
+
+    .victory-overlay p {
+      font-size: 1.05rem;
+      max-width: 420px;
+      line-height: 1.4;
+      color: #f1faee;
+    }
+
+    .play-again-btn {
+      margin-top: 8px;
+      background: #2a9d8f;
+      color: #ffffff;
+      border: 3px solid #ffffff;
+      border-radius: 999px;
+      padding: 10px 26px;
+      font-size: 1.05rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+      transition: transform 0.15s;
+    }
+
+    .play-again-btn:hover {
+      transform: scale(1.06);
+      background: #52b788;
+    }
+
+    /* Enemy Nutrition & Details Card */
+    .enemy-card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 3px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 2px dashed #e2e8f0;
+      padding-bottom: 10px;
+    }
+
+    .card-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-sprite-preview {
+      width: 52px;
+      height: 52px;
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+
+    .card-sprite-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .enemy-name-group h2 {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--text-dark);
+      line-height: 1.1;
+    }
+
+    .phonetic-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .badges-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 5px;
+    }
+
+    .color-badge {
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    }
+
+    .type-badge {
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.73rem;
+      font-weight: 800;
+      background: #edf2f4;
+      color: var(--text-dark);
+    }
+
+    .spelling-boxes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      padding: 4px 0;
+    }
+
+    .letter-box {
+      width: 31px;
+      height: 35px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      border: 2px solid #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1rem;
+      color: var(--text-dark);
+      transition: all 0.14s ease;
+    }
+
+    .letter-box.spoken {
+      background: var(--accent-gold);
+      border-color: #fb8500;
+      color: #1d3557;
+      transform: translateY(-5px) scale(1.12);
+      box-shadow: 0 4px 10px rgba(255, 183, 3, 0.4);
+    }
+
+    .nutrition-box {
+      background: #f4fbf7;
+      border-left: 5px solid var(--accent-green);
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      line-height: 1.45;
+      color: #2b4c3f;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .nutrition-box strong {
+      color: #1b4332;
+    }
+
+    .nutrient-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .nutrient-tag {
+      background: #d8f3dc;
+      color: #1b4332;
+      font-size: 0.74rem;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 6px;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .speak-again-btn {
+      background: #e0fbfc;
+      color: #005f73;
+      border: 2px solid #98c1d9;
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.15s;
+    }
+
+    .speak-again-btn:hover {
+      background: #bde0fe;
+    }
+
+    /* Controls & Equipment Bar */
+    .controls-panel {
+      display: grid;
+      grid-template-columns: 1.1fr 1.9fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 800px) {
+      .controls-panel {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .weapon-switcher-card, .upgrades-card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 14px 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .section-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 800;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .weapon-toggle-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      flex-grow: 1;
+    }
+
+    .weapon-btn {
+      border: 3px solid #e2e8f0;
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 10px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      transition: all 0.15s ease;
+    }
+
+    .weapon-btn .w-icon {
+      font-size: 1.6rem;
+    }
+
+    .weapon-btn .w-title {
+      font-weight: 900;
+      font-size: 0.92rem;
+      color: var(--text-dark);
+    }
+
+    .weapon-btn .w-dmg {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--text-muted);
+    }
+
+    .weapon-btn.active-melee {
+      border-color: var(--accent-melee);
+      background: #fff0f3;
+      box-shadow: 0 6px 14px rgba(230, 57, 70, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .weapon-btn.active-ranged {
+      border-color: var(--accent-ranged);
+      background: #f0f7ff;
+      box-shadow: 0 6px 14px rgba(58, 134, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .weapon-btn.pulse-attention {
+      animation: pulseBow 0.8s infinite alternate;
+      border-color: var(--accent-gold);
+      background: #fffbeb;
+    }
+
+    @keyframes pulseBow {
+      from { box-shadow: 0 0 0 0 rgba(255, 183, 3, 0.6); transform: scale(1); }
+      to { box-shadow: 0 0 0 8px rgba(255, 183, 3, 0); transform: scale(1.04); }
+    }
+
+    .quick-swap-hint {
+      text-align: center;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Upgrades Grid (2 Weapon Evolution Cards) */
+    .upgrades-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      flex-grow: 1;
+    }
+
+    @media (max-width: 560px) {
+      .upgrades-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .upgrade-btn {
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: left;
+      transition: all 0.18s ease;
+    }
+
+    .upgrade-btn:hover:not(:disabled) {
+      border-color: var(--accent-green);
+      background: #f0fdf4;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(42, 157, 143, 0.14);
+    }
+
+    .upgrade-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .upg-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 800;
+      font-size: 0.88rem;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+      gap: 6px;
+    }
+
+    .upg-lvl {
+      background: #e2e8f0;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      white-space: nowrap;
+    }
+
+    .upg-visual-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .upg-weapon-preview {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      padding: 4px;
+    }
+
+    .upg-weapon-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .upg-desc {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .w-svg-icon {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      margin-bottom: 2px;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .weapon-btn.evolved-pop .w-svg-icon {
+      transform: scale(1.32) rotate(-8deg);
+    }
+
+    .upg-cost {
+      background: var(--accent-gold);
+      color: #1d3557;
+      font-weight: 900;
+      font-size: 0.78rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .credit-note {
+      text-align: right;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: rgba(29, 53, 87, 0.35);
+      letter-spacing: 0.3px;
+      margin-top: -6px;
+      padding: 0 4px;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="game-wrapper">
+  <!-- Interactive Start Overlay: Unlocks Browser Web Speech API & Audio cleanly -->
+  <div class="start-overlay" id="startOverlay">
+    <div class="start-card">
+      <div style="font-size: 3.2rem;">🍅🏹🥦</div>
+      <h2>Veggie & Fruit Sprout Quest</h2>
+      <p>
+        Learn English spelling, pronunciation, and healthy nutrition while sprouting produce into happy trees!<br/><br/>
+        <strong>🗡️ Chef's Spade (Melee):</strong> High damage for Ground Veggies.<br/>
+        <strong>🏹 Seed Slingshot (Projectile):</strong> Needed for Flying Fruits!
+      </p>
+      <button class="start-btn" id="startAdventureBtn">▶️ Start Adventure (Enable Voice)</button>
+    </div>
+  </div>
+
+  <!-- Top HUD -->
+  <div class="top-bar">
+    <div class="title-group">
+      <h1>🌱 Veggie & Fruit Sprout Quest</h1>
+      <span class="stage-pill" id="stagePill">Level 1 / 20</span>
+      <div class="level-progress-bar" title="Progress to Level 20 Cap">
+        <div class="level-progress-fill" id="levelProgressFill"></div>
+      </div>
+    </div>
+    <div class="stats-group">
+      <div class="stat-badge" title="Golden Seeds earned from planting!">
+        <span>🌻 Seeds:</span>
+        <span id="goldCount">0</span>
+      </div>
+      <div class="stat-badge" style="background:#eefbf3; border-color:#2a9d8f; color:#1b4332;">
+        <span>🌳 Trees Grown:</span>
+        <span id="treesCount">0 / 20</span>
+      </div>
+      <button class="sound-btn" id="soundToggleBtn">🔊 Voice & Sound: ON</button>
+    </div>
+  </div>
+
+  <!-- Main Stage: Battle Canvas + Educational Card -->
+  <div class="main-stage">
+    <div class="canvas-container">
+      <canvas id="gameCanvas" width="600" height="370"></canvas>
+      <div class="speech-banner" id="speechBanner">T - O - M - A - T - O • Tomato!</div>
+      <button class="weapon-warning" id="weaponWarning" title="Click to switch to Slingshot!">
+        ⚠️ Flying Fruit! Click Here or Press [SPACE] for Slingshot 🏹
+      </button>
+
+      <!-- Level 20 Victory Modal -->
+      <div class="victory-overlay" id="victoryOverlay">
+        <h2>🏆 Garden Master! (Level 20 Complete!)</h2>
+        <p>You sprouted all 20 healthy fruits and vegetables into a thriving orchard and mastered their English spellings!</p>
+        <button class="play-again-btn" id="playAgainBtn">🔄 Play Again (Levels 1 - 20)</button>
+      </div>
+    </div>
+
+    <!-- Educational Enemy Details Card -->
+    <div class="enemy-card" id="enemyCard">
+      <div class="card-header">
+        <div class="card-title-wrap">
+          <div class="card-sprite-preview">
+            <img id="cardSpriteImg" alt="Produce Sprite" src="" />
+          </div>
+          <div class="enemy-name-group">
+            <h2 id="cardName">Tomato</h2>
+            <div class="phonetic-text" id="cardPhonetic">/təˈmeɪ.toʊ/ • Garden Fruit</div>
+          </div>
+        </div>
+        <div class="badges-col">
+          <span class="color-badge" id="cardColorBadge" style="background:#e63946;">Red</span>
+          <span class="type-badge" id="cardTypeBadge">🗡️ Ground (Melee Strong)</span>
+        </div>
+      </div>
+
+      <div class="spelling-boxes" id="spellingBoxes"></div>
+
+      <div class="nutrition-box">
+        <div id="cardFact"></div>
+        <div class="nutrient-tags" id="cardNutrients"></div>
+      </div>
+
+      <div class="card-footer">
+        <span id="voiceInfoText">🎤 Voice: Sunny Soprano</span>
+        <button class="speak-again-btn" id="speakAgainBtn">🎵 Hear Spelling</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Controls: Weapon Toggle + Equipment Upgrades -->
+  <div class="controls-panel">
+    <div class="weapon-switcher-card">
+      <div class="section-label">
+        <span>Active Weapon</span>
+        <span>Click or Press [SPACE]</span>
+      </div>
+      <div class="weapon-toggle-group">
+        <button class="weapon-btn active-melee" id="btnMelee">
+          <img class="w-svg-icon" id="activeMeleeImg" alt="Melee Weapon" src="" />
+          <span class="w-title" id="activeMeleeTitle">Wooden Trowel</span>
+          <span class="w-dmg" id="meleeDmgText">Melee • 20 DMG</span>
+        </button>
+        <button class="weapon-btn" id="btnRanged">
+          <img class="w-svg-icon" id="activeRangedImg" alt="Projectile Weapon" src="" />
+          <span class="w-title" id="activeRangedTitle">Twig Slingshot</span>
+          <span class="w-dmg" id="rangedDmgText">Projectile • 5 DMG</span>
+        </button>
+      </div>
+      <div class="quick-swap-hint">
+        💡 <strong>Tip:</strong> Melee is much stronger, but flying fruits require the Projectile weapon!
+      </div>
+    </div>
+
+    <div class="upgrades-card">
+      <div class="section-label">
+        <span>Weapon Evolution & Upgrades (Max Lv. 20)</span>
+        <span>Upgrading Evolves Weapon Form & Impact!</span>
+      </div>
+      <div class="upgrades-grid">
+        <button class="upgrade-btn" id="upgMeleeBtn">
+          <div>
+            <div class="upg-top">
+              <span id="upgMeleeName">Evolve Melee Weapon</span>
+              <span class="upg-lvl" id="upgMeleeLvl">Lv. 1</span>
+            </div>
+            <div class="upg-visual-row">
+              <div class="upg-weapon-preview">
+                <img id="upgMeleePreviewImg" alt="Next Melee Form" src="" />
+              </div>
+              <div class="upg-desc" id="upgMeleeDesc">Next: Iron Spade (+12 DMG & Larger Slash)</div>
+            </div>
+          </div>
+          <div class="upg-cost" id="upgMeleeCost">🌻 12 Seeds</div>
+        </button>
+
+        <button class="upgrade-btn" id="upgRangedBtn">
+          <div>
+            <div class="upg-top">
+              <span id="upgRangedName">Evolve Projectile Weapon</span>
+              <span class="upg-lvl" id="upgRangedLvl">Lv. 1</span>
+            </div>
+            <div class="upg-visual-row">
+              <div class="upg-weapon-preview">
+                <img id="upgRangedPreviewImg" alt="Next Ranged Form" src="" />
+              </div>
+              <div class="upg-desc" id="upgRangedDesc">Next: Oak Slingshot (+3 DMG & Bigger Seed)</div>
+            </div>
+          </div>
+          <div class="upg-cost" id="upgRangedCost">🌻 10 Seeds</div>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="credit-note">created by Papa W for M</div>
+</div>
+
+<script>
+/**
+ * VEGGIE & FRUIT SPROUT QUEST (v3 - Fully Verified & Paced)
+ *
+ * Root-Cause Fixes Implemented:
+ * 1. Voice Not Voicing:
+ *    - Added an interactive "Start Adventure" button so the browser's autoplay policy unlocks `window.speechSynthesis` and `AudioContext` on the first user click.
+ *    - Removed `speechSynthesis.cancel()` spam during rapid hits and replaced it with a Speech-Gated Combat Pace: the hero waits for the current spelling + pronunciation utterance to finish before launching the next attack!
+ * 2. Stopping Midway Through Level 2:
+ *    - Level 2 is a Flying Fruit (Blueberry). Previously, if the player had Melee equipped, the warning banner wasn't clickable and if the player didn't notice it, the hero swung forever doing 0 damage. Now:
+ *      (a) The warning banner is a big clickable button that switches to the Slingshot, AND the Slingshot button pulses gold.
+ *      (b) After 2 blocked melee swings against a flying fruit, the smart gardener helper automatically switches to the Slingshot (with a friendly message) so an idle player NEVER gets stuck on Level 2!
+ * 3. Pace Too Fast:
+ *    - Slowed the base attack interval and synchronized attacks with the spelling cadence (260ms per letter) so every single letter is clearly spoken, heard, and highlighted before the next swing happens.
+ *    - Tuned enemy HP so every enemy takes ~3–4 full attacks (giving plenty of time to read the nutrition card and hear the spelling).
+ */
+
+const MAX_LEVEL = 20;
+
+// --- 1. DETAILED KAWAII SVG SPRITE GENERATOR (20 Unique Fruits & Vegetables - Zero Repeats!) ---
+function createDetailedProduceSVG(item, isHit = false) {
+  const c1 = item.colorHex;
+  const c2 = item.secondaryHex;
+  const hitOverlay = isHit ? `<circle cx="64" cy="68" r="46" fill="rgba(255,255,255,0.65)"/>` : '';
+  const eyesAndSmile = isHit
+    ? `<circle cx="48" cy="66" r="5.5" fill="#1d3557"/><circle cx="46" cy="64" r="2" fill="#fff"/>
+       <circle cx="80" cy="66" r="5.5" fill="#1d3557"/><circle cx="78" cy="64" r="2" fill="#fff"/>
+       <ellipse cx="38" cy="74" rx="5" ry="3" fill="#ff758f" opacity="0.7"/>
+       <ellipse cx="90" cy="74" rx="5" ry="3" fill="#ff758f" opacity="0.7"/>
+       <circle cx="64" cy="76" r="6" fill="#e63946" stroke="#1d3557" stroke-width="2.5"/>`
+    : `<circle cx="48" cy="66" r="5.5" fill="#1d3557"/><circle cx="46" cy="64" r="2.2" fill="#fff"/>
+       <circle cx="80" cy="66" r="5.5" fill="#1d3557"/><circle cx="78" cy="64" r="2.2" fill="#fff"/>
+       <ellipse cx="38" cy="73" rx="5.5" ry="3" fill="#ff758f" opacity="0.65"/>
+       <ellipse cx="90" cy="73" rx="5.5" ry="3" fill="#ff758f" opacity="0.65"/>
+       <path d="M 56 73 Q 64 81 72 73" fill="none" stroke="#1d3557" stroke-width="3.2" stroke-linecap="round"/>`;
+
+  let bodySvg = '';
+  switch (item.id) {
+    case 'tomato':
+      bodySvg = `
+        <ellipse cx="64" cy="70" rx="44" ry="39" fill="${c1}" stroke="#780000" stroke-width="3"/>
+        <ellipse cx="45" cy="52" rx="12" ry="6" transform="rotate(-25 45 52)" fill="rgba(255,255,255,0.45)"/>
+        <path d="M64 22 L58 34 L42 28 L52 39 L38 45 L56 44 L64 53 L72 44 L90 45 L76 39 L86 28 L70 34 Z" fill="${c2}" stroke="#1b4332" stroke-width="2.5" stroke-linejoin="round"/>
+      `;
+      break;
+    case 'blueberry':
+      bodySvg = `
+        <circle cx="64" cy="70" r="39" fill="${c1}" stroke="#0f172a" stroke-width="3"/>
+        <ellipse cx="46" cy="50" rx="11" ry="5.5" transform="rotate(-28 46 50)" fill="rgba(255,255,255,0.5)"/>
+        <path d="M48 33 L56 24 L64 32 L72 24 L80 33 L74 38 L54 38 Z" fill="${c2}" stroke="#0f172a" stroke-width="2.5" stroke-linejoin="round"/>
+      `;
+      break;
+    case 'carrot':
+      bodySvg = `
+        <path d="M64 34 C50 10, 36 16, 48 36 M64 34 C64 6, 74 6, 66 34 M64 34 C78 12, 92 18, 78 36" fill="${c2}" stroke="#1b4332" stroke-width="3" stroke-linecap="round"/>
+        <path d="M34 42 Q64 34 94 42 L70 112 Q64 120 58 112 Z" fill="${c1}" stroke="#7f3700" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M44 54 H56 M72 62 H84 M48 82 H60" stroke="#9c4100" stroke-width="3" stroke-linecap="round"/>
+      `;
+      break;
+    case 'banana':
+      bodySvg = `
+        <path d="M32 32 Q18 76 64 106 Q106 88 96 40 Q80 76 52 66 Q40 50 44 30 Z" fill="${c1}" stroke="#9c6644" stroke-width="3" stroke-linejoin="round"/>
+        <rect x="34" y="22" width="12" height="10" rx="3" fill="${c2}" stroke="#3d2c2e" stroke-width="2"/>
+        <ellipse cx="46" cy="55" rx="5" ry="12" transform="rotate(-18 46 55)" fill="rgba(255,255,255,0.5)"/>
+      `;
+      break;
+    case 'broccoli':
+      bodySvg = `
+        <path d="M48 64 L52 108 Q64 114 76 108 L80 64 Z" fill="${c2}" stroke="#1b4332" stroke-width="3"/>
+        <circle cx="40" cy="54" r="22" fill="${c1}" stroke="#1b4332" stroke-width="2.5"/>
+        <circle cx="88" cy="54" r="22" fill="${c1}" stroke="#1b4332" stroke-width="2.5"/>
+        <circle cx="64" cy="40" r="25" fill="${c1}" stroke="#1b4332" stroke-width="2.5"/>
+        <circle cx="64" cy="64" r="24" fill="${c1}"/>
+      `;
+      break;
+    case 'grape':
+      bodySvg = `
+        <path d="M64 16 L64 32 M64 24 Q80 14 86 26" fill="none" stroke="${c2}" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="44" cy="48" r="16" fill="${c1}" stroke="#240046" stroke-width="2.5"/>
+        <circle cx="84" cy="48" r="16" fill="${c1}" stroke="#240046" stroke-width="2.5"/>
+        <circle cx="64" cy="46" r="17" fill="${c1}" stroke="#240046" stroke-width="2.5"/>
+        <circle cx="38" cy="68" r="16" fill="${c1}" stroke="#240046" stroke-width="2.5"/>
+        <circle cx="90" cy="68" r="16" fill="${c1}" stroke="#240046" stroke-width="2.5"/>
+        <circle cx="52" cy="86" r="16" fill="${c1}" stroke="#240046" stroke-width="2.5"/>
+        <circle cx="76" cy="86" r="16" fill="${c1}" stroke="#240046" stroke-width="2.5"/>
+        <circle cx="64" cy="98" r="15" fill="${c1}" stroke="#240046" stroke-width="2.5"/>
+        <circle cx="64" cy="68" r="24" fill="${c1}"/>
+      `;
+      break;
+    case 'eggplant':
+      bodySvg = `
+        <ellipse cx="64" cy="72" rx="35" ry="41" fill="${c1}" stroke="#240046" stroke-width="3"/>
+        <ellipse cx="46" cy="56" rx="7" ry="15" transform="rotate(-15 46 56)" fill="rgba(255,255,255,0.35)"/>
+        <path d="M46 36 Q64 20 82 36 L76 46 L64 38 L52 46 Z" fill="${c2}" stroke="#1b4332" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M64 16 L64 28" stroke="${c2}" stroke-width="5" stroke-linecap="round"/>
+      `;
+      break;
+    case 'strawberry':
+      bodySvg = `
+        <path d="M30 52 C26 32, 102 32, 98 52 C94 84, 78 108, 64 112 C50 108, 34 84, 30 52 Z" fill="${c1}" stroke="#800f2f" stroke-width="3"/>
+        <g fill="#ffd166">
+          <circle cx="44" cy="52" r="2.2"/><circle cx="64" cy="48" r="2.2"/><circle cx="84" cy="52" r="2.2"/>
+          <circle cx="38" cy="68" r="2.2"/><circle cx="90" cy="68" r="2.2"/>
+          <circle cx="50" cy="88" r="2.2"/><circle cx="64" cy="94" r="2.2"/><circle cx="78" cy="88" r="2.2"/>
+        </g>
+        <path d="M42 36 L56 26 L64 34 L72 26 L86 36 L74 42 L54 42 Z" fill="${c2}" stroke="#004b23" stroke-width="2.5" stroke-linejoin="round"/>
+      `;
+      break;
+    case 'pumpkin':
+      bodySvg = `
+        <path d="M58 20 Q64 10 72 18 L68 36 L58 36 Z" fill="${c2}" stroke="#1b4332" stroke-width="2.5"/>
+        <ellipse cx="42" cy="72" rx="24" ry="35" fill="#e85d04" stroke="#6a040f" stroke-width="2.5"/>
+        <ellipse cx="86" cy="72" rx="24" ry="35" fill="#e85d04" stroke="#6a040f" stroke-width="2.5"/>
+        <ellipse cx="64" cy="72" rx="28" ry="37" fill="${c1}" stroke="#6a040f" stroke-width="2.8"/>
+      `;
+      break;
+    case 'lemon':
+      bodySvg = `
+        <path d="M18 68 Q28 32 64 32 Q100 32 110 68 Q100 104 64 104 Q28 104 18 68 Z" fill="${c1}" stroke="#b58300" stroke-width="3"/>
+        <ellipse cx="52" cy="48" rx="14" ry="6" fill="rgba(255,255,255,0.45)"/>
+        <path d="M64 32 Q78 16 90 24 Q78 36 64 32 Z" fill="${c2}" stroke="#1b4332" stroke-width="2.2"/>
+      `;
+      break;
+    case 'potato':
+      bodySvg = `
+        <ellipse cx="64" cy="70" rx="43" ry="35" transform="rotate(-8 64 70)" fill="${c1}" stroke="#582f0e" stroke-width="3"/>
+        <circle cx="42" cy="52" r="3" fill="${c2}"/><circle cx="84" cy="56" r="2.5" fill="${c2}"/><circle cx="52" cy="92" r="3" fill="${c2}"/><circle cx="78" cy="88" r="2.5" fill="${c2}"/>
+        <ellipse cx="48" cy="48" rx="10" ry="5" fill="rgba(255,255,255,0.28)"/>
+      `;
+      break;
+    case 'cherry':
+      bodySvg = `
+        <path d="M48 44 Q58 14 78 16 M80 46 Q74 22 78 16" fill="none" stroke="${c2}" stroke-width="4" stroke-linecap="round"/>
+        <path d="M76 16 Q94 12 98 24 Q82 28 76 16 Z" fill="${c2}" stroke="#1b4332" stroke-width="2"/>
+        <circle cx="44" cy="74" r="26" fill="${c1}" stroke="#590d22" stroke-width="2.8"/>
+        <circle cx="82" cy="74" r="26" fill="${c1}" stroke="#590d22" stroke-width="2.8"/>
+        <ellipse cx="64" cy="70" rx="34" ry="28" fill="${c1}"/>
+      `;
+      break;
+    case 'corn':
+      bodySvg = `
+        <ellipse cx="64" cy="66" rx="28" ry="44" fill="${c1}" stroke="#b58300" stroke-width="3"/>
+        <path d="M46 46 H82 M42 58 H86 M44 70 H84 M48 84 H80" stroke="#f4a261" stroke-width="2.5"/>
+        <path d="M36 96 C20 68, 28 44, 44 76 L64 110 Z" fill="${c2}" stroke="#1b4332" stroke-width="2.5"/>
+        <path d="M92 96 C108 68, 100 44, 84 76 L64 110 Z" fill="${c2}" stroke="#1b4332" stroke-width="2.5"/>
+      `;
+      break;
+    case 'peach':
+      bodySvg = `
+        <path d="M64 106 C24 96, 18 52, 44 36 C56 28, 64 40, 64 40 C64 40, 72 28, 84 36 C110 52, 104 96, 64 106 Z" fill="${c1}" stroke="#9d0208" stroke-width="3"/>
+        <path d="M64 34 Q82 18 92 28 Q78 40 64 34 Z" fill="${c2}" stroke="#1b4332" stroke-width="2.2"/>
+        <ellipse cx="44" cy="52" rx="9" ry="5" transform="rotate(-25 44 52)" fill="rgba(255,255,255,0.45)"/>
+      `;
+      break;
+    case 'radish':
+      bodySvg = `
+        <path d="M64 32 C46 8, 32 16, 48 36 M64 32 C64 6, 76 6, 66 32 M64 32 C82 8, 96 16, 80 36" fill="${c2}" stroke="#1b4332" stroke-width="3" stroke-linecap="round"/>
+        <path d="M28 64 C28 36, 100 36, 100 64 C100 88, 70 104, 64 116 C58 104, 28 88, 28 64 Z" fill="${c1}" stroke="#641220" stroke-width="3"/>
+        <path d="M46 96 Q64 88 82 96 L64 116 Z" fill="#fff0f3"/>
+      `;
+      break;
+    case 'pineapple':
+      bodySvg = `
+        <path d="M64 10 L54 34 L38 18 L48 38 L78 38 L90 18 L74 34 Z" fill="${c2}" stroke="#1b4332" stroke-width="2.5" stroke-linejoin="round"/>
+        <rect x="32" y="34" width="64" height="74" rx="28" fill="${c1}" stroke="#9c6644" stroke-width="3"/>
+        <path d="M40 46 L88 94 M88 46 L40 94" stroke="#e07a5f" stroke-width="2" opacity="0.55"/>
+      `;
+      break;
+    case 'onion':
+      bodySvg = `
+        <path d="M58 14 L62 34 M68 12 L66 34" stroke="#52b788" stroke-width="4" stroke-linecap="round"/>
+        <path d="M26 74 C26 46, 54 34, 64 26 C74 34, 102 46, 102 74 C102 98, 84 108, 64 108 C44 108, 26 98, 26 74 Z" fill="${c1}" stroke="#6c584c" stroke-width="3"/>
+        <path d="M46 38 Q38 72 50 104 M82 38 Q90 72 78 104" fill="none" stroke="${c2}" stroke-width="2" opacity="0.6"/>
+      `;
+      break;
+    case 'watermelon':
+      bodySvg = `
+        <circle cx="64" cy="68" r="42" fill="${c2}" stroke="#1b4332" stroke-width="3"/>
+        <circle cx="64" cy="68" r="35" fill="${c1}"/>
+        <g fill="#1d3557">
+          <circle cx="48" cy="48" r="2.3"/><circle cx="80" cy="48" r="2.3"/>
+          <circle cx="44" cy="86" r="2.3"/><circle cx="64" cy="92" r="2.3"/><circle cx="84" cy="86" r="2.3"/>
+        </g>
+      `;
+      break;
+    case 'cabbage':
+      bodySvg = `
+        <circle cx="44" cy="68" r="30" fill="${c2}" stroke="#1b4332" stroke-width="2.5"/>
+        <circle cx="84" cy="68" r="30" fill="${c2}" stroke="#1b4332" stroke-width="2.5"/>
+        <circle cx="64" cy="68" r="36" fill="${c1}" stroke="#1b4332" stroke-width="3"/>
+        <path d="M44 46 Q64 62 48 94 M84 46 Q64 62 80 94" fill="none" stroke="#d8f3dc" stroke-width="3" stroke-linecap="round"/>
+      `;
+      break;
+    case 'mango':
+    default:
+      bodySvg = `
+        <path d="M32 58 C28 30, 88 24, 96 54 C104 82, 82 110, 56 106 C36 102, 36 82, 32 58 Z" fill="${c1}" stroke="#9c6644" stroke-width="3"/>
+        <ellipse cx="64" cy="52" rx="24" ry="14" fill="${c2}" opacity="0.45"/>
+        <path d="M62 28 Q80 14 90 24 Q74 36 62 28 Z" fill="#2a9d8f" stroke="#1b4332" stroke-width="2.2"/>
+      `;
+      break;
+  }
+
+  const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">${bodySvg}${hitOverlay}${eyesAndSmile}</svg>`;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svgStr);
+}
+
+// --- 2. ENEMY DATABASE (20 Unique Fruits & Vegetables - 1 Per Level, Zero Repeats!) ---
+const PRODUCE_DB = [
+  {
+    id: "tomato", name: "Tomato", phonetic: "/təˈmeɪ.toʊ/", category: "Garden Fruit",
+    colorName: "Red", colorHex: "#e63946", secondaryHex: "#2a9d8f", isFlying: false,
+    fact: "The <strong>Tomato</strong> is bright red and juicy! It is filled with <strong>Lycopene and Vitamin C</strong>, which protect your heart and keep your skin glowing.",
+    nutrients: ["Vitamin C", "Lycopene", "Heart Health"], voiceLabel: "Sunny Soprano", pitchBase: 1.2, rateBase: 0.9, melodyBaseFreq: 329.63
+  },
+  {
+    id: "blueberry", name: "Blueberry", phonetic: "/ˈbluːˌbɛr.i/", category: "Flying Berry",
+    colorName: "Blue", colorHex: "#3a86ff", secondaryHex: "#1d3557", isFlying: true,
+    fact: "The <strong>Blueberry</strong> is deep blue and sweet! It is packed with <strong>Antioxidants and Vitamin K</strong>, which boost your brain memory and focus.",
+    nutrients: ["Antioxidants", "Vitamin K", "Brain Boost"], voiceLabel: "Breezy Pixie", pitchBase: 1.38, rateBase: 0.92, melodyBaseFreq: 392.00
+  },
+  {
+    id: "carrot", name: "Carrot", phonetic: "/ˈkær.ət/", category: "Root Veggie",
+    colorName: "Orange", colorHex: "#fb8500", secondaryHex: "#52b788", isFlying: false,
+    fact: "The <strong>Carrot</strong> is crunchy and bright orange! It is loaded with <strong>Beta-Carotene and Vitamin A</strong>, giving you sharp eyesight and strong immunity.",
+    nutrients: ["Vitamin A", "Beta-Carotene", "Eye Sight"], voiceLabel: "Crunchy Tenor", pitchBase: 0.96, rateBase: 0.9, melodyBaseFreq: 293.66
+  },
+  {
+    id: "banana", name: "Banana", phonetic: "/bəˈnæn.ə/", category: "Gliding Fruit",
+    colorName: "Yellow", colorHex: "#ffb703", secondaryHex: "#6c584c", isFlying: true,
+    fact: "The <strong>Banana</strong> is bright yellow and creamy! It is rich in <strong>Potassium and Vitamin B6</strong>, giving your muscles quick natural energy.",
+    nutrients: ["Potassium", "Vitamin B6", "Quick Energy"], voiceLabel: "Mellow Baritone", pitchBase: 0.85, rateBase: 0.88, melodyBaseFreq: 261.63
+  },
+  {
+    id: "broccoli", name: "Broccoli", phonetic: "/ˈbrɒk.əl.i/", category: "Green Veggie",
+    colorName: "Green", colorHex: "#2d6a4f", secondaryHex: "#95d5b2", isFlying: false,
+    fact: "<strong>Broccoli</strong> looks like a miniature green tree! It is packed with <strong>Fiber, Calcium, and Vitamin K</strong> to build strong bones.",
+    nutrients: ["Fiber", "Calcium", "Bone Strength"], voiceLabel: "Forest Guardian", pitchBase: 0.78, rateBase: 0.88, melodyBaseFreq: 246.94
+  },
+  {
+    id: "grape", name: "Grape", phonetic: "/ɡreɪp/", category: "Floating Vine",
+    colorName: "Purple", colorHex: "#7209b7", secondaryHex: "#52b788", isFlying: true,
+    fact: "The <strong>Grape</strong> is royal purple and refreshing! It is filled with <strong>Resveratrol and Hydration</strong>, supporting healthy blood flow.",
+    nutrients: ["Resveratrol", "Hydration", "Antioxidants"], voiceLabel: "Chirpy Alto", pitchBase: 1.3, rateBase: 0.92, melodyBaseFreq: 349.23
+  },
+  {
+    id: "eggplant", name: "Eggplant", phonetic: "/ˈɛɡ.plænt/", category: "Garden Veggie",
+    colorName: "Violet", colorHex: "#5a189a", secondaryHex: "#40916c", isFlying: false,
+    fact: "The <strong>Eggplant</strong> has a glossy purple skin! It is rich in <strong>Nasunin and Dietary Fiber</strong>, helping protect brain cells.",
+    nutrients: ["Dietary Fiber", "Nasunin", "Manganese"], voiceLabel: "Royal Bass", pitchBase: 0.75, rateBase: 0.86, melodyBaseFreq: 220.00
+  },
+  {
+    id: "strawberry", name: "Strawberry", phonetic: "/ˈstrɔːˌbɛr.i/", category: "Winged Berry",
+    colorName: "Crimson", colorHex: "#ff0054", secondaryHex: "#38b000", isFlying: true,
+    fact: "The <strong>Strawberry</strong> is vibrant red and covered in tiny seeds! It has abundant <strong>Vitamin C and Folate</strong> to boost collagen and immunity.",
+    nutrients: ["High Vitamin C", "Folate", "Immunity"], voiceLabel: "Sweet Melody", pitchBase: 1.35, rateBase: 0.9, melodyBaseFreq: 440.00
+  },
+  {
+    id: "pumpkin", name: "Pumpkin", phonetic: "/ˈpʌmp.kɪn/", category: "Harvest Squash",
+    colorName: "Amber", colorHex: "#f77f00", secondaryHex: "#2a9d8f", isFlying: false,
+    fact: "The <strong>Pumpkin</strong> is plump and golden-orange! It is packed with <strong>Lutein, Vitamin A, and Iron</strong> for healthy eyes and strong blood.",
+    nutrients: ["Lutein", "Vitamin A", "Rich Iron"], voiceLabel: "Harvest Baritone", pitchBase: 0.72, rateBase: 0.88, melodyBaseFreq: 261.63
+  },
+  {
+    id: "lemon", name: "Lemon", phonetic: "/ˈlɛm.ən/", category: "Flying Citrus",
+    colorName: "Lemon Yellow", colorHex: "#ffd166", secondaryHex: "#40916c", isFlying: true,
+    fact: "The <strong>Lemon</strong> is zesty and bright yellow! It is overflowing with <strong>Citric Acid and Vitamin C</strong>, helping your body absorb iron and stay refreshed.",
+    nutrients: ["Citric Acid", "Vitamin C", "Detox"], voiceLabel: "Zesty Soprano", pitchBase: 1.44, rateBase: 0.94, melodyBaseFreq: 392.00
+  },
+  {
+    id: "potato", name: "Potato", phonetic: "/pəˈteɪ.toʊ/", category: "Earth Tuber",
+    colorName: "Golden Tan", colorHex: "#ddb892", secondaryHex: "#7f5539", isFlying: false,
+    fact: "The <strong>Potato</strong> grows underground and is a powerhouse of <strong>Complex Carbohydrates, Potassium, and Vitamin B6</strong> for lasting stamina!",
+    nutrients: ["Stamina Carbs", "Potassium", "Vitamin B6"], voiceLabel: "Earthy Tenor", pitchBase: 0.88, rateBase: 0.88, melodyBaseFreq: 293.66
+  },
+  {
+    id: "cherry", name: "Cherry", phonetic: "/ˈtʃɛr.i/", category: "Twin Stonefruit",
+    colorName: "Ruby Red", colorHex: "#d90429", secondaryHex: "#52b788", isFlying: true,
+    fact: "<strong>Cherries</strong> grow in sweet ruby pairs! They are rich in <strong>Melatonin and Anthocyanins</strong>, helping muscles recover and supporting restful sleep.",
+    nutrients: ["Melatonin", "Recovery", "Antioxidants"], voiceLabel: "Twin Harmony", pitchBase: 1.4, rateBase: 0.92, melodyBaseFreq: 440.00
+  },
+  {
+    id: "corn", name: "Corn", phonetic: "/kɔːrn/", category: "Golden Grain",
+    colorName: "Sunny Gold", colorHex: "#fcbf49", secondaryHex: "#2a9d8f", isFlying: false,
+    fact: "<strong>Sweet Corn</strong> is lined with golden kernels! It provides <strong>Insoluble Fiber, Zeaxanthin, and B Vitamins</strong> to fuel your day.",
+    nutrients: ["Zeaxanthin", "B Vitamins", "Healthy Fiber"], voiceLabel: "Sunny Tenor", pitchBase: 1.05, rateBase: 0.9, melodyBaseFreq: 329.63
+  },
+  {
+    id: "peach", name: "Peach", phonetic: "/piːtʃ/", category: "Velvet Fruit",
+    colorName: "Coral Pink", colorHex: "#ff8fa3", secondaryHex: "#52b788", isFlying: true,
+    fact: "The <strong>Peach</strong> has fuzzy coral skin and sweet juice! It contains <strong>Vitamins A, C, and E</strong> to keep your skin soft and digestion smooth.",
+    nutrients: ["Vitamin E", "Skin Glow", "Hydration"], voiceLabel: "Velvet Alto", pitchBase: 1.26, rateBase: 0.9, melodyBaseFreq: 349.23
+  },
+  {
+    id: "radish", name: "Radish", phonetic: "/ˈræd.ɪʃ/", category: "Crisp Root",
+    colorName: "Magenta", colorHex: "#e01e37", secondaryHex: "#40916c", isFlying: false,
+    fact: "The <strong>Radish</strong> is peppery, crisp, and magenta! It is rich in <strong>Catechin and Natural Nitrates</strong> that keep your liver and blood vessels healthy.",
+    nutrients: ["Catechin", "Crunch Fiber", "Heart Flow"], voiceLabel: "Peppy Tenor", pitchBase: 1.12, rateBase: 0.9, melodyBaseFreq: 329.63
+  },
+  {
+    id: "pineapple", name: "Pineapple", phonetic: "/ˈpaɪnˌæp.əl/", category: "Tropical Crown",
+    colorName: "Tropical Gold", colorHex: "#f4a261", secondaryHex: "#2a9d8f", isFlying: true,
+    fact: "The <strong>Pineapple</strong> wears a leafy crown! It is the only fruit packed with <strong>Bromelain and Manganese</strong>, which aid digestion and soothe inflammation.",
+    nutrients: ["Bromelain", "Manganese", "Digestion"], voiceLabel: "Island Chime", pitchBase: 1.18, rateBase: 0.88, melodyBaseFreq: 392.00
+  },
+  {
+    id: "onion", name: "Onion", phonetic: "/ˈʌn.jən/", category: "Layered Bulb",
+    colorName: "Pearl Amber", colorHex: "#e6ccb2", secondaryHex: "#b08968", isFlying: false,
+    fact: "The <strong>Onion</strong> has many savory layers! It is loaded with <strong>Quercetin and Prebiotics</strong>, which fight germs and feed friendly gut bacteria.",
+    nutrients: ["Quercetin", "Prebiotics", "Immunity"], voiceLabel: "Savory Baritone", pitchBase: 0.82, rateBase: 0.88, melodyBaseFreq: 246.94
+  },
+  {
+    id: "watermelon", name: "Watermelon", phonetic: "/ˈwɔː.tərˌmɛl.ən/", category: "Melon Berry",
+    colorName: "Melon Pink", colorHex: "#ff4d6d", secondaryHex: "#2d6a4f", isFlying: true,
+    fact: "<strong>Watermelon</strong> is 92% refreshing water! It is filled with <strong>Citrulline and Lycopene</strong>, keeping you hydrated on hot sunny days.",
+    nutrients: ["92% Water", "Citrulline", "Lycopene"], voiceLabel: "Splashy Soprano", pitchBase: 1.24, rateBase: 0.88, melodyBaseFreq: 349.23
+  },
+  {
+    id: "cabbage", name: "Cabbage", phonetic: "/ˈkæb.ɪdʒ/", category: "Leafy Head",
+    colorName: "Mint Green", colorHex: "#74c69d", secondaryHex: "#40916c", isFlying: false,
+    fact: "<strong>Cabbage</strong> is packed with crisp leafy layers! It is rich in <strong>Vitamin K, Sulforaphane, and Folate</strong> for strong cellular health.",
+    nutrients: ["Sulforaphane", "Vitamin K", "Folate"], voiceLabel: "Crisp Bass", pitchBase: 0.76, rateBase: 0.88, melodyBaseFreq: 220.00
+  },
+  {
+    id: "mango", name: "Mango", phonetic: "/ˈmæŋ.ɡoʊ/", category: "King of Fruits",
+    colorName: "Sunset Gold", colorHex: "#ff9f1c", secondaryHex: "#ffbf69", isFlying: true,
+    fact: "The <strong>Mango</strong> is known as the King of Fruits! It is bursting with <strong>Over 20 Vitamins & Minerals</strong>, including Vitamins A, C, and Copper!",
+    nutrients: ["20+ Vitamins", "Copper", "Royal Energy"], voiceLabel: "Golden Finale", pitchBase: 1.32, rateBase: 0.9, melodyBaseFreq: 440.00
+  }
+];
+
+const SPRITE_CACHE = {};
+PRODUCE_DB.forEach(item => {
+  const imgNormal = new Image();
+  imgNormal.src = createDetailedProduceSVG(item, false);
+  const imgHit = new Image();
+  imgHit.src = createDetailedProduceSVG(item, true);
+  SPRITE_CACHE[item.id] = { normal: imgNormal, hit: imgHit, dataUrl: imgNormal.src };
+});
+
+// --- 2B. EVOLVING FARMING TOOLS SYSTEM (20 Distinct Colors & Farming Tool Sprites - Zero Repeats!) ---
+const MELEE_FARM_TOOLS = [
+  { name: "Wooden Trowel", shape: "trowel", color: "#cbd5e1", edge: "#475569", handle: "#8d5524" },
+  { name: "Copper Trowel", shape: "trowel", color: "#f97316", edge: "#9a3412", handle: "#78350f" },
+  { name: "Iron Garden Spade", shape: "spade", color: "#94a3b8", edge: "#1e293b", handle: "#7c2d12" },
+  { name: "Bronze Digging Spade", shape: "spade", color: "#d97706", edge: "#78350f", handle: "#451a03" },
+  { name: "Silver Weeding Hoe", shape: "hoe", color: "#e2e8f0", edge: "#0284c7", handle: "#854d0e" },
+  { name: "Cobalt Field Hoe", shape: "hoe", color: "#3b82f6", edge: "#1d4ed8", handle: "#1e3a8a" },
+  { name: "Crimson Garden Rake", shape: "rake", color: "#ef4444", edge: "#991b1b", handle: "#7f1d1d" },
+  { name: "Amber Leaf Rake", shape: "rake", color: "#f59e0b", edge: "#b45309", handle: "#78350f" },
+  { name: "Emerald Hay Pitchfork", shape: "fork", color: "#10b981", edge: "#047857", handle: "#064e3b" },
+  { name: "Jade Composting Fork", shape: "fork", color: "#14b8a6", edge: "#0f766e", handle: "#134e4a" },
+  { name: "Amethyst Pruning Sickle", shape: "sickle", color: "#a855f7", edge: "#6b21a8", handle: "#3b0764" },
+  { name: "Magenta Berry Sickle", shape: "sickle", color: "#ec4899", edge: "#9d174d", handle: "#500724" },
+  { name: "Rose Pruning Shears", shape: "shears", color: "#f43f5e", edge: "#881337", handle: "#4c0519" },
+  { name: "Cyan Hedge Clippers", shape: "shears", color: "#06b6d4", edge: "#155e75", handle: "#083344" },
+  { name: "Golden Orchard Mattock", shape: "mattock", color: "#eab308", edge: "#854d0e", handle: "#422006" },
+  { name: "Sunburst Soil Mattock", shape: "mattock", color: "#facc15", edge: "#ca8a04", handle: "#713f12" },
+  { name: "Lime Rotary Cultivator", shape: "cultivator", color: "#84cc16", edge: "#3f6212", handle: "#1a2e05" },
+  { name: "Indigo Star Cultivator", shape: "cultivator", color: "#6366f1", edge: "#3730a3", handle: "#1e1b4b" },
+  { name: "Diamond Harvest Scythe", shape: "scythe", color: "#38bdf8", edge: "#0369a1", handle: "#0c4a6e" },
+  { name: "👑 Mythic Prismatic Scythe", shape: "scythe", color: "#c084fc", edge: "#fde047", handle: "#581c87" }
+];
+
+const RANGED_FARM_TOOLS = [
+  { name: "Twig Seed Slingshot", shape: "slingshot", color: "#8d5524", band: "#ffd166", proj: "#ffb703" },
+  { name: "Oak Acorn Slingshot", shape: "slingshot", color: "#b45309", band: "#fde047", proj: "#f97316" },
+  { name: "Bamboo Pea Shooter", shape: "peashooter", color: "#84cc16", band: "#ecfccb", proj: "#65a30d" },
+  { name: "Jade Reed Blower", shape: "peashooter", color: "#10b981", band: "#a7f3d0", proj: "#059669" },
+  { name: "Copper Watering Can", shape: "wateringcan", color: "#f97316", band: "#fed7aa", proj: "#38bdf8" },
+  { name: "Azure Garden Waterer", shape: "wateringcan", color: "#0ea5e9", band: "#bae6fd", proj: "#0284c7" },
+  { name: "Crimson Mist Sprayer", shape: "sprayer", color: "#ef4444", band: "#fecaca", proj: "#f43f5e" },
+  { name: "Violet Compost Sprayer", shape: "sprayer", color: "#8b5cf6", band: "#ddd6fe", proj: "#7c3aed" },
+  { name: "Teal Garden Hose Nozzle", shape: "nozzle", color: "#14b8a6", band: "#99f6e4", proj: "#06b6d4" },
+  { name: "Cobalt Pressure Hose", shape: "nozzle", color: "#3b82f6", band: "#bfdbfe", proj: "#2563eb" },
+  { name: "Golden Seed Spreader", shape: "spreader", color: "#eab308", band: "#fef08a", proj: "#ca8a04" },
+  { name: "Tangerine Broadcast Seeder", shape: "spreader", color: "#f59e0b", band: "#fde68a", proj: "#d97706" },
+  { name: "Pink Nectar Pollinator", shape: "pollinator", color: "#ec4899", band: "#fbcfe8", proj: "#db2777" },
+  { name: "Magenta Blossom Duster", shape: "pollinator", color: "#d946ef", band: "#f5d0fe", proj: "#c026d3" },
+  { name: "Silver Lawn Sprinkler", shape: "sprinkler", color: "#64748b", band: "#e2e8f0", proj: "#0ea5e9" },
+  { name: "Emerald Turbo Sprinkler", shape: "sprinkler", color: "#22c55e", band: "#bbf7d0", proj: "#16a34a" },
+  { name: "Ruby Fertilizer Launcher", shape: "cannon", color: "#e11d48", band: "#fecdd3", proj: "#fb7185" },
+  { name: "Sapphire Hydro Cannon", shape: "cannon", color: "#2563eb", band: "#bfdbfe", proj: "#60a5fa" },
+  { name: "Solar Greenhouse Blaster", shape: "blaster", color: "#facc15", band: "#fef9c3", proj: "#eab308" },
+  { name: "👑 Mythic Raincloud Maker", shape: "blaster", color: "#a855f7", band: "#f3e8ff", proj: "#38bdf8" }
+];
+
+function getMeleeWeaponData(level) {
+  const lv = Math.max(1, Math.min(MAX_LEVEL, level));
+  const cur = MELEE_FARM_TOOLS[lv - 1];
+  const next = MELEE_FARM_TOOLS[Math.min(MAX_LEVEL - 1, lv)];
+  const scale = 1 + (lv - 1) * 0.038;
+  const glowColor = cur.color + "55";
+
+  let toolSvg = `<circle cx="34" cy="32" r="${16 + lv * 0.5}" fill="${cur.color}" opacity="0.22"/>`;
+  toolSvg += `<rect x="6" y="28" width="18" height="8" rx="3" fill="${cur.handle}"/>`;
+
+  switch (cur.shape) {
+    case "trowel":
+      toolSvg += `<path d="M22 18 L54 32 L22 46 Z" fill="${cur.color}" stroke="${cur.edge}" stroke-width="3" stroke-linejoin="round"/>`;
+      break;
+    case "spade":
+      toolSvg += `<path d="M22 14 L50 18 Q58 32 50 46 L22 50 Z" fill="${cur.color}" stroke="${cur.edge}" stroke-width="3"/>`;
+      break;
+    case "hoe":
+      toolSvg += `<rect x="20" y="29" width="24" height="6" fill="${cur.handle}"/><rect x="40" y="14" width="10" height="34" rx="2" fill="${cur.color}" stroke="${cur.edge}" stroke-width="3"/>`;
+      break;
+    case "rake":
+      toolSvg += `<rect x="20" y="29" width="22" height="6" fill="${cur.handle}"/><rect x="40" y="12" width="6" height="40" rx="2" fill="${cur.color}" stroke="${cur.edge}" stroke-width="2.5"/>
+                  <path d="M46 15 H56 M46 23 H56 M46 32 H56 M46 41 H56 M46 49 H56" stroke="${cur.color}" stroke-width="3.5" stroke-linecap="round"/>`;
+      break;
+    case "fork":
+      toolSvg += `<path d="M24 20 V44 M24 20 H54 M24 32 H56 M24 44 H54" fill="none" stroke="${cur.color}" stroke-width="4" stroke-linecap="round"/>`;
+      break;
+    case "sickle":
+      toolSvg += `<path d="M22 32 C28 10, 56 12, 54 38 C46 24, 30 24, 22 32 Z" fill="${cur.color}" stroke="${cur.edge}" stroke-width="3" stroke-linejoin="round"/>`;
+      break;
+    case "shears":
+      toolSvg += `<path d="M20 24 L54 16 L34 32 Z" fill="${cur.color}" stroke="${cur.edge}" stroke-width="2.5"/><path d="M20 40 L54 48 L34 32 Z" fill="${cur.color}" stroke="${cur.edge}" stroke-width="2.5"/><circle cx="30" cy="32" r="4" fill="#fff" stroke="${cur.edge}" stroke-width="2"/>`;
+      break;
+    case "mattock":
+      toolSvg += `<rect x="20" y="29" width="24" height="6" fill="${cur.handle}"/><path d="M34 10 L48 10 L44 54 L38 54 Z" fill="${cur.color}" stroke="${cur.edge}" stroke-width="3"/>`;
+      break;
+    case "cultivator":
+      toolSvg += `<circle cx="42" cy="32" r="16" fill="${cur.color}" stroke="${cur.edge}" stroke-width="3"/><path d="M42 12 V52 M22 32 H62 M28 18 L56 46 M56 18 L28 46" stroke="${cur.edge}" stroke-width="3" stroke-linecap="round"/>`;
+      break;
+    case "scythe":
+    default:
+      toolSvg += `<rect x="16" y="29" width="30" height="6" fill="${cur.handle}"/><path d="M42 30 C46 8, 62 12, 58 52 C50 36, 44 34, 42 30 Z" fill="${cur.color}" stroke="${cur.edge}" stroke-width="3"/>`;
+      break;
+  }
+
+  // Add reinforced collar & badge on even levels so every single level 1-20 has a unique structure + color!
+  if (lv % 2 === 0) {
+    toolSvg += `<rect x="19" y="26" width="5" height="12" rx="2" fill="${cur.edge}"/><circle cx="14" cy="14" r="5" fill="${cur.color}" stroke="${cur.edge}" stroke-width="1.5"/>`;
+  }
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">${toolSvg}</svg>`;
+  return {
+    level: lv,
+    name: cur.name,
+    nextName: next.name,
+    shape: cur.shape,
+    scale,
+    bladeColor: cur.color,
+    edgeColor: cur.edge,
+    handleColor: cur.handle,
+    glowColor,
+    slashColor: cur.color,
+    svgUrl: 'data:image/svg+xml;utf8,' + encodeURIComponent(svg)
+  };
+}
+
+function getRangedWeaponData(level) {
+  const lv = Math.max(1, Math.min(MAX_LEVEL, level));
+  const cur = RANGED_FARM_TOOLS[lv - 1];
+  const next = RANGED_FARM_TOOLS[Math.min(MAX_LEVEL - 1, lv)];
+  const scale = 1 + (lv - 1) * 0.036;
+  const projRadius = 7 + Math.min(11, (lv - 1) * 0.55);
+  const glowColor = cur.proj + "55";
+
+  let toolSvg = `<circle cx="34" cy="32" r="${16 + lv * 0.5}" fill="${cur.proj}" opacity="0.22"/>`;
+
+  switch (cur.shape) {
+    case "slingshot":
+      toolSvg += `<path d="M18 52 L28 34 L20 14 M28 34 L42 18" fill="none" stroke="${cur.color}" stroke-width="6" stroke-linecap="round"/><path d="M20 14 L42 28 L42 18" fill="none" stroke="${cur.band}" stroke-width="3"/><circle cx="42" cy="28" r="6" fill="${cur.proj}"/>`;
+      break;
+    case "peashooter":
+      toolSvg += `<rect x="10" y="25" width="38" height="14" rx="6" fill="${cur.color}" stroke="#1b4332" stroke-width="2.5"/><path d="M32 25 Q38 14 46 18 Q40 26 32 25 Z" fill="${cur.band}"/><circle cx="54" cy="32" r="6" fill="${cur.proj}"/>`;
+      break;
+    case "wateringcan":
+      toolSvg += `<path d="M18 24 C8 24, 8 44, 18 44" fill="none" stroke="${cur.color}" stroke-width="4"/><rect x="18" y="22" width="22" height="24" rx="5" fill="${cur.color}" stroke="#1e293b" stroke-width="2.5"/><path d="M40 36 L54 22 L58 26 L40 42 Z" fill="${cur.band}"/><circle cx="56" cy="18" r="4" fill="${cur.proj}"/>`;
+      break;
+    case "sprayer":
+      toolSvg += `<rect x="18" y="24" width="22" height="26" rx="6" fill="${cur.color}" stroke="#1e293b" stroke-width="2.5"/><rect x="24" y="16" width="10" height="8" fill="${cur.band}"/><path d="M34 20 H50" stroke="${cur.color}" stroke-width="4" stroke-linecap="round"/><circle cx="56" cy="20" r="5" fill="${cur.proj}"/>`;
+      break;
+    case "nozzle":
+      toolSvg += `<path d="M12 44 L26 28 L46 28 L52 22 L52 38 L46 32 L28 32 L18 48 Z" fill="${cur.color}" stroke="#1e293b" stroke-width="2.5"/><circle cx="57" cy="30" r="5.5" fill="${cur.proj}"/>`;
+      break;
+    case "spreader":
+      toolSvg += `<path d="M16 18 L44 18 L36 44 L24 44 Z" fill="${cur.color}" stroke="#1e293b" stroke-width="2.5"/><circle cx="30" cy="46" r="8" fill="${cur.band}" stroke="#1e293b" stroke-width="2"/><circle cx="52" cy="28" r="5" fill="${cur.proj}"/><circle cx="54" cy="40" r="4" fill="${cur.proj}"/>`;
+      break;
+    case "pollinator":
+      toolSvg += `<ellipse cx="24" cy="32" rx="12" ry="16" fill="${cur.band}" stroke="${cur.color}" stroke-width="3"/><rect x="36" y="28" width="16" height="8" rx="3" fill="${cur.color}"/><circle cx="56" cy="32" r="6" fill="${cur.proj}"/>`;
+      break;
+    case "sprinkler":
+      toolSvg += `<rect x="16" y="38" width="32" height="10" rx="4" fill="${cur.color}" stroke="#1e293b" stroke-width="2.5"/><rect x="29" y="22" width="6" height="16" fill="${cur.band}"/><path d="M18 22 H46" stroke="${cur.color}" stroke-width="5" stroke-linecap="round"/><circle cx="32" cy="12" r="5" fill="${cur.proj}"/>`;
+      break;
+    case "cannon":
+      toolSvg += `<rect x="12" y="22" width="34" height="20" rx="8" fill="${cur.color}" stroke="#1e293b" stroke-width="2.5"/><rect x="42" y="18" width="8" height="28" rx="3" fill="${cur.band}"/><circle cx="56" cy="32" r="7" fill="${cur.proj}" stroke="#fff" stroke-width="2"/>`;
+      break;
+    case "blaster":
+    default:
+      toolSvg += `<polygon points="10,20 44,16 50,32 44,48 10,44" fill="${cur.color}" stroke="#1e293b" stroke-width="2.5"/><circle cx="28" cy="32" r="7" fill="${cur.band}"/><circle cx="56" cy="32" r="8" fill="${cur.proj}" stroke="#fff" stroke-width="2"/>`;
+      break;
+  }
+
+  // Add level-specific star/stripe accent on even levels so every single level 1-20 has a unique sprite structure + color!
+  if (lv % 2 === 0) {
+    toolSvg += `<circle cx="14" cy="14" r="5" fill="${cur.band}" stroke="#1e293b" stroke-width="1.5"/>`;
+  }
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">${toolSvg}</svg>`;
+  return {
+    level: lv,
+    name: cur.name,
+    nextName: next.name,
+    shape: cur.shape,
+    scale,
+    projRadius,
+    frameColor: cur.color,
+    bandColor: cur.band,
+    projColor: cur.proj,
+    glowColor,
+    svgUrl: 'data:image/svg+xml;utf8,' + encodeURIComponent(svg)
+  };
+}
+
+// Preload all 20 Melee and 20 Ranged Farming Tool sprites for crisp Canvas hand rendering
+const WEAPON_SPRITE_CACHE = { melee: {}, ranged: {} };
+for (let lv = 1; lv <= MAX_LEVEL; lv++) {
+  const mData = getMeleeWeaponData(lv);
+  const mImg = new Image();
+  mImg.src = mData.svgUrl;
+  WEAPON_SPRITE_CACHE.melee[lv] = mImg;
+
+  const rData = getRangedWeaponData(lv);
+  const rImg = new Image();
+  rImg.src = rData.svgUrl;
+  WEAPON_SPRITE_CACHE.ranged[lv] = rImg;
+}
+
+// --- 3. GAME STATE (Fixed Relaxed Educational Pacing + Evolving Weapons) ---
+const state = {
+  started: false,
+  level: 1,
+  gold: 0,
+  treesGrown: 0,
+  soundEnabled: true,
+  isVictory: false,
+
+  activeWeapon: 'melee',
+
+  // Weapon Evolutions (Capped at Level 20)
+  meleeLevel: 1,
+  meleeDamage: 20, // Ground enemy base HP is 60 -> takes 3 relaxed attacks
+  meleeCost: 12,
+
+  rangedLevel: 1,
+  rangedDamage: 5, // Flying enemy base HP is 15 -> takes 3 relaxed attacks
+  rangedCost: 10,
+
+  // Fixed, steady post-speech attack rhythm so spelling momentum is NEVER rushed or broken!
+  postSpeechCooldownMs: 1650,
+
+  // Player animation & impact effects
+  playerX: 135,
+  playerY: 272,
+  cooldownTimerMs: 0,
+  swingAnim: 0,
+  screenShake: 0,
+
+  // Speech & Pacing lock: hero NEVER interrupts an active spelling sequence!
+  isBusySpeaking: false,
+  busySafetyTimerMs: 0,
+
+  // Active Enemy & Respawn
+  enemy: null,
+  respawnTimer: 0,
+  produceCursor: 0,
+  blockedSwingCount: 0,
+
+  // Visual Entities (Projectiles, Slash Arcs, Impact Shockwaves, Particles, Trees)
+  projectiles: [],
+  slashEffects: [],
+  shockwaves: [],
+  floatingTexts: [],
+  particles: [],
+  trees: [],
+  clouds: [
+    { x: 80, y: 52, speed: 12, scale: 1.0 },
+    { x: 310, y: 38, speed: 8, scale: 0.78 },
+    { x: 490, y: 70, speed: 14, scale: 0.92 }
+  ]
+};
+
+// --- 4. ROBUST WEB SPEECH & MELODIC SPELLING ENGINE ---
+let audioCtx = null;
+let availableVoices = [];
+let activeSpellingTimers = [];
+// Keep global reference to current SpeechSynthesisUtterance so Chrome GC never garbage-collects it mid-speech!
+window._activeUtterances = [];
+
+function initAudioAndVoice() {
+  if (!audioCtx) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) audioCtx = new AudioContextClass();
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.resume();
+    loadVoices();
+  }
+}
+
+function loadVoices() {
+  if ('speechSynthesis' in window) {
+    const all = window.speechSynthesis.getVoices();
+    const en = all.filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
+    availableVoices = en.length > 0 ? en : all;
+  }
+}
+if ('speechSynthesis' in window) {
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function clearSpellingTimers() {
+  while (activeSpellingTimers.length > 0) {
+    clearTimeout(activeSpellingTimers.pop());
+  }
+}
+
+function playNote(freq, startTime, duration, type = 'sine', volume = 0.12) {
+  if (!state.soundEnabled || !audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, startTime);
+
+  gain.gain.setValueAtTime(volume, startTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(startTime);
+  osc.stop(startTime + duration);
+}
+
+function playEventTone(eventType) {
+  if (!state.soundEnabled) return;
+  initAudioAndVoice();
+  if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+
+  if (eventType === 'spawn') {
+    playNote(392.0, now, 0.1, 'sine', 0.11);
+    playNote(523.25, now + 0.1, 0.16, 'triangle', 0.13);
+  } else if (eventType === 'kill') {
+    [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+      playNote(freq, now + idx * 0.085, 0.25, 'sine', 0.14);
+    });
+  } else if (eventType === 'blocked') {
+    playNote(185, now, 0.14, 'sawtooth', 0.09);
+  }
+}
+
+/**
+ * Speaks a single letter or word immediately at the exact moment it is called.
+ * Because each letter's utterance is triggered inside that letter's visual highlight timer,
+ * the voice and the highlighted letter box are 100% locked in sync (even on 10-letter words!).
+ */
+function speakTokenImmediately(text, pitch, rate, produce, forceReset = false) {
+  if (!state.soundEnabled || !('speechSynthesis' in window)) return;
+  try {
+    if (forceReset || window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+      window.speechSynthesis.cancel();
+    }
+    window.speechSynthesis.resume();
+  } catch (e) {}
+
+  const voiceIdx = Math.max(0, PRODUCE_DB.indexOf(produce));
+  const chosenVoice = availableVoices.length > 0
+    ? availableVoices[voiceIdx % availableVoices.length]
+    : null;
+
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US';
+  // Keep pitch in a warm, natural range (0.8 to 1.35) so TTS voices never say "Capital A"
+  utter.pitch = Math.max(0.8, Math.min(1.35, pitch));
+  utter.rate = Math.max(0.82, Math.min(1.05, rate));
+  if (chosenVoice) utter.voice = chosenVoice;
+
+  window._activeUtterances = [utter];
+  window.speechSynthesis.speak(utter);
+}
+
+/**
+ * Toddler-friendly, frame-synced spelling & pronunciation!
+ * - 'spawn': Welcoming introduction ("Tomato!") with a calm pause before combat begins.
+ * - 'attack': Highlights one letter box every 750ms and speaks ONLY that letter at that exact instant,
+ *             then highlights the full word and pronounces it once all letters are done!
+ * - 'kill': Celebratory sprout ("Yay! Tomato tree!")
+ */
+function triggerExpressiveVoice(produce, eventType) {
+  if (!produce) return;
+  clearSpellingTimers();
+
+  const banner = document.getElementById('speechBanner');
+  const word = produce.name;
+  const letters = word.toUpperCase().split('');
+  const letterBoxes = document.querySelectorAll('#spellingBoxes .letter-box');
+  letterBoxes.forEach(b => b.classList.remove('spoken'));
+
+  initAudioAndVoice();
+
+  if (eventType === 'spawn') {
+    banner.innerHTML = `✨ <span class="letter-highlight">${word.toUpperCase()}</span>!`;
+    showBannerBriefly(banner, 1500);
+    state.isBusySpeaking = true;
+    state.cooldownTimerMs = 0;
+    state.busySafetyTimerMs = 1800;
+
+    speakTokenImmediately(`${word}!`, produce.pitchBase * 1.05, 0.92, produce, true);
+
+    const spawnDoneTimer = setTimeout(() => {
+      state.isBusySpeaking = false;
+      state.cooldownTimerMs = Math.max(0, state.postSpeechCooldownMs - 900);
+    }, 1450);
+    activeSpellingTimers.push(spawnDoneTimer);
+    return;
+  }
+
+  if (eventType === 'kill') {
+    banner.innerHTML = `🌳 <span class="letter-highlight">${word}</span> Tree!`;
+    showBannerBriefly(banner, 1800);
+    state.isBusySpeaking = true;
+    state.cooldownTimerMs = 0;
+    state.busySafetyTimerMs = 2200;
+
+    speakTokenImmediately(`Yay! ${word} tree!`, produce.pitchBase * 1.15, 0.95, produce, true);
+
+    const killDoneTimer = setTimeout(() => {
+      state.isBusySpeaking = false;
+    }, 1850);
+    activeSpellingTimers.push(killDoneTimer);
+    return;
+  }
+
+  // EVENT: 'attack' -> Toddler-friendly 750ms per letter!
+  // Each letter's audio is spoken inside its own 750ms step timer right when its box lights up,
+  // so when "A" in TOMATO (or any letter in BLUEBERRY) is highlighted, the voice says that exact letter!
+  const pentatonicSemitones = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24];
+  const stepMs = 750; // Gentle 0.75s per letter for a 1-year-old learning pace
+
+  state.isBusySpeaking = true;
+  state.cooldownTimerMs = 0;
+  const wordPronounceDelayMs = letters.length * stepMs + 150;
+  const totalSequenceMs = wordPronounceDelayMs + 1500;
+  state.busySafetyTimerMs = totalSequenceMs + 500;
+
+  letters.forEach((letter, idx) => {
+    const t = setTimeout(() => {
+      letterBoxes.forEach(b => b.classList.remove('spoken'));
+      if (letterBoxes[idx]) letterBoxes[idx].classList.add('spoken');
+
+      const highlighted = letters
+        .map((ch, i) => (i === idx ? `<span class="letter-highlight">${ch}</span>` : ch))
+        .join(' - ');
+      banner.innerHTML = `🎵 ${highlighted}`;
+      banner.classList.add('active');
+
+      if (audioCtx && state.soundEnabled) {
+        const semi = pentatonicSemitones[idx % pentatonicSemitones.length];
+        const freq = produce.melodyBaseFreq * Math.pow(2, semi / 12);
+        playNote(freq, audioCtx.currentTime, 0.18, 'triangle', 0.10);
+      }
+
+      // Speak THIS exact letter right as its box highlights!
+      const letterPitch = produce.pitchBase + Math.min(0.25, idx * 0.03);
+      speakTokenImmediately(letter, letterPitch, 0.92, produce, idx === 0);
+    }, idx * stepMs);
+    activeSpellingTimers.push(t);
+  });
+
+  // Final word pronunciation flourish (only spoken AFTER every single letter has finished!)
+  const wordFlourishTimer = setTimeout(() => {
+    letterBoxes.forEach(b => b.classList.add('spoken'));
+    banner.innerHTML = `🌟 <span class="letter-highlight">${word.toUpperCase()}!</span>`;
+    if (audioCtx && state.soundEnabled) {
+      playNote(produce.melodyBaseFreq * 2, audioCtx.currentTime, 0.3, 'sine', 0.13);
+    }
+    speakTokenImmediately(`${word}!`, produce.pitchBase * 1.15, 0.9, produce, true);
+  }, wordPronounceDelayMs);
+  activeSpellingTimers.push(wordFlourishTimer);
+
+  const unlockNextAttackTimer = setTimeout(() => {
+    letterBoxes.forEach(b => b.classList.remove('spoken'));
+    banner.classList.remove('active');
+    state.isBusySpeaking = false;
+    // Start a fresh calm pause AFTER the word pronunciation finishes!
+    state.cooldownTimerMs = 0;
+  }, totalSequenceMs);
+  activeSpellingTimers.push(unlockNextAttackTimer);
+}
+
+function showBannerBriefly(banner, durationMs) {
+  banner.classList.add('active');
+  clearTimeout(banner._hideTimer);
+  banner._hideTimer = setTimeout(() => banner.classList.remove('active'), durationMs);
+}
+
+// --- 5. SYNCHRONIZED ENEMY SPAWNING & CARD UI ---
+function spawnEnemyForCurrentLevel() {
+  if (state.isVictory) return;
+
+  const produce = PRODUCE_DB[state.produceCursor % PRODUCE_DB.length];
+  state.produceCursor += 1;
+  state.blockedSwingCount = 0;
+
+  // Balanced HP so each enemy takes ~3-4 attacks (plenty of time to hear the spelling and read the card)
+  const levelMultiplier = 1 + (state.level - 1) * 0.18;
+  const baseHp = produce.isFlying ? 15 : 60;
+  const maxHp = Math.round(baseHp * levelMultiplier);
+  const goldReward = Math.round((produce.isFlying ? 10 : 15) * levelMultiplier);
+
+  state.enemy = {
+    produce,
+    maxHp,
+    hp: maxHp,
+    goldReward,
+    x: 445,
+    y: produce.isFlying ? 135 : 258,
+    baseY: produce.isFlying ? 135 : 258,
+    hitFlash: 0,
+    spawnScale: 0.15,
+    bobPhase: 0
+  };
+
+  // Give 0.9s after spawn voice finishes before the first swing
+  state.cooldownTimerMs = 500;
+
+  syncCardWithEnemy(state.enemy);
+  updateHUD();
+  playEventTone('spawn');
+  triggerExpressiveVoice(produce, 'spawn');
+}
+
+function syncCardWithEnemy(enemy) {
+  if (!enemy || !enemy.produce) return;
+  const produce = enemy.produce;
+
+  document.getElementById('cardName').textContent = produce.name;
+  document.getElementById('cardPhonetic').textContent = `${produce.phonetic} • ${produce.category}`;
+  document.getElementById('cardSpriteImg').src = SPRITE_CACHE[produce.id].dataUrl;
+
+  const colorBadge = document.getElementById('cardColorBadge');
+  colorBadge.textContent = produce.colorName;
+  colorBadge.style.background = produce.colorHex;
+
+  const typeBadge = document.getElementById('cardTypeBadge');
+  if (produce.isFlying) {
+    typeBadge.textContent = "🪽 Flying (Ranged Tool Only!)";
+    typeBadge.style.background = "#dbeafe";
+    typeBadge.style.color = "#1e40af";
+  } else {
+    typeBadge.textContent = "🪴 Ground (Melee Tool Strong)";
+    typeBadge.style.background = "#fee2e2";
+    typeBadge.style.color = "#991b1b";
+  }
+
+  const boxesContainer = document.getElementById('spellingBoxes');
+  boxesContainer.innerHTML = '';
+  for (const ch of produce.name.toUpperCase()) {
+    const div = document.createElement('div');
+    div.className = 'letter-box';
+    div.textContent = ch;
+    boxesContainer.appendChild(div);
+  }
+
+  document.getElementById('cardFact').innerHTML = produce.fact;
+  document.getElementById('cardNutrients').innerHTML = produce.nutrients
+    .map(n => `<span class="nutrient-tag">✨ ${n}</span>`)
+    .join('');
+  document.getElementById('voiceInfoText').textContent = `🎤 Voice: ${produce.voiceLabel}`;
+}
+
+// --- 6. COMBAT & WEAPON MECHANICS ---
+function setWeapon(weaponType) {
+  const changed = state.activeWeapon !== weaponType;
+  state.activeWeapon = weaponType;
+  state.blockedSwingCount = 0;
+  document.getElementById('btnMelee').classList.toggle('active-melee', weaponType === 'melee');
+  document.getElementById('btnRanged').classList.toggle('active-ranged', weaponType === 'ranged');
+  document.getElementById('btnRanged').classList.remove('pulse-attention');
+
+  // When player manually switches weapons, clear any in-flight projectile from the old weapon
+  // and ready the new weapon so the next attack registers promptly!
+  if (changed) {
+    state.projectiles = [];
+    if (!state.isBusySpeaking) {
+      state.cooldownTimerMs = Math.max(state.cooldownTimerMs, state.postSpeechCooldownMs - 180);
+    }
+  }
+}
+
+function toggleWeapon() {
+  setWeapon(state.activeWeapon === 'melee' ? 'ranged' : 'melee');
+}
+
+function performAttack() {
+  if (!state.enemy || state.isVictory) return;
+  const targetEnemy = state.enemy;
+
+  // Check if Flying Fruit while Melee is equipped
+  if (targetEnemy.produce.isFlying && state.activeWeapon === 'melee') {
+    state.swingAnim = 1.0;
+    state.blockedSwingCount += 1;
+    playEventTone('blocked');
+
+    // Pulse the Slingshot button so the user sees what to click
+    document.getElementById('btnRanged').classList.add('pulse-attention');
+
+    if (state.blockedSwingCount >= 2) {
+      // Auto-assist after 2 missed swings so the game NEVER gets stuck on Level 2!
+      setWeapon('ranged');
+      addFloatingText("Auto-Switched to Ranged Tool! 🌻", state.playerX + 40, state.playerY - 70, "#3a86ff");
+      state.cooldownTimerMs = state.postSpeechCooldownMs * 0.7;
+    } else {
+      addFloatingText("Flying! Switch to Ranged Tool 🌻", targetEnemy.x, targetEnemy.y - 55, "#ef233c");
+    }
+    return;
+  }
+
+  if (state.activeWeapon === 'melee') {
+    const mData = getMeleeWeaponData(state.meleeLevel);
+    state.swingAnim = 1.0;
+
+    // Spawn an impactful crescent slash wave that scales with Melee Level!
+    state.slashEffects.push({
+      x: targetEnemy.x - 18,
+      y: targetEnemy.y - 14,
+      radius: 34 + state.meleeLevel * 2.2,
+      color: mData.slashColor,
+      edgeColor: mData.edgeColor,
+      thickness: 5 + state.meleeLevel * 0.45,
+      age: 0,
+      maxAge: 0.34
+    });
+
+    applyDamageToEnemy(targetEnemy, state.meleeDamage, 'melee', state.meleeLevel);
+  } else {
+    const rData = getRangedWeaponData(state.rangedLevel);
+    state.swingAnim = 0.75;
+    state.projectiles.push({
+      x: state.playerX + 30,
+      y: state.playerY - 28,
+      targetEnemy,
+      speed: 620,
+      damage: state.rangedDamage,
+      level: state.rangedLevel,
+      radius: rData.projRadius,
+      color: rData.projColor,
+      glowColor: rData.glowColor,
+      shape: rData.shape
+    });
+  }
+}
+
+function applyDamageToEnemy(targetEnemy, dmg, weaponKind = 'melee', weaponLv = 1) {
+  if (!state.enemy || state.enemy !== targetEnemy) return;
+
+  targetEnemy.hp = Math.max(0, targetEnemy.hp - dmg);
+  targetEnemy.hitFlash = 1.0;
+
+  // Impact camera shake & expanding shockwave ring that scales with weapon upgrade level!
+  state.screenShake = Math.min(9, 1.5 + weaponLv * 0.38);
+  const wColor = weaponKind === 'melee'
+    ? getMeleeWeaponData(weaponLv).slashColor
+    : getRangedWeaponData(weaponLv).projColor;
+
+  state.shockwaves.push({
+    x: targetEnemy.x,
+    y: targetEnemy.y - 14,
+    radius: 10,
+    maxRadius: 38 + weaponLv * 3.2,
+    color: wColor,
+    lineWidth: 3 + weaponLv * 0.25,
+    alpha: 0.95
+  });
+
+  // Burst of particles scaling with weapon upgrade level
+  const particleCount = 8 + Math.min(14, weaponLv);
+  for (let i = 0; i < particleCount; i++) {
+    state.particles.push({
+      x: targetEnemy.x,
+      y: targetEnemy.y - 12,
+      vx: (Math.random() - 0.5) * (180 + weaponLv * 8),
+      vy: (Math.random() - 0.8) * (180 + weaponLv * 8),
+      radius: 4 + Math.random() * (3.5 + weaponLv * 0.2),
+      color: i % 3 === 0 ? wColor : (i % 2 === 0 ? targetEnemy.produce.colorHex : targetEnemy.produce.secondaryHex),
+      alpha: 1.0
+    });
+  }
+
+  addFloatingText(`-${dmg}`, targetEnemy.x + (Math.random() * 24 - 12), targetEnemy.y - 55, "#1d3557");
+
+  if (targetEnemy.hp <= 0) {
+    handleEnemyDefeated(targetEnemy);
+  } else {
+    triggerExpressiveVoice(targetEnemy.produce, 'attack');
+  }
+}
+
+function handleEnemyDefeated(defeatedEnemy) {
+  state.gold += defeatedEnemy.goldReward;
+  state.treesGrown += 1;
+
+  // Positive Kill Animation: turns into a fruit tree and blinks away with sparkles!
+  state.trees.push({
+    x: defeatedEnemy.x,
+    y: 280,
+    fruitColor: defeatedEnemy.produce.colorHex,
+    age: 0,
+    maxAge: 2.3
+  });
+
+  playEventTone('kill');
+  triggerExpressiveVoice(defeatedEnemy.produce, 'kill');
+  addFloatingText(`+${defeatedEnemy.goldReward} 🌻 Seeds!`, defeatedEnemy.x, defeatedEnemy.y - 80, "#fb8500");
+
+  state.enemy = null;
+  state.projectiles = [];
+
+  if (state.treesGrown >= MAX_LEVEL) {
+    state.level = MAX_LEVEL;
+    state.isVictory = true;
+    updateHUD();
+    setTimeout(() => {
+      document.getElementById('victoryOverlay').classList.add('show');
+    }, 1200);
+  } else {
+    state.level = Math.min(MAX_LEVEL, state.treesGrown + 1);
+    // Comfortable 1.8s pause while watching the tree sprout before the next enemy appears
+    state.respawnTimer = 1.8;
+    updateHUD();
+  }
+}
+
+function addFloatingText(text, x, y, color) {
+  state.floatingTexts.push({ text, x, y, vy: -42, alpha: 1.0, color });
+}
+
+// --- 7. WEAPON EVOLUTION UPGRADES (CAPPED AT LEVEL 20) & UI CONTROLS ---
+function updateHUD() {
+  document.getElementById('goldCount').textContent = state.gold;
+  document.getElementById('treesCount').textContent = `${state.treesGrown} / ${MAX_LEVEL}`;
+  document.getElementById('stagePill').textContent = `Level ${state.level} / ${MAX_LEVEL}`;
+  document.getElementById('levelProgressFill').style.width = `${(state.treesGrown / MAX_LEVEL) * 100}%`;
+
+  const mCur = getMeleeWeaponData(state.meleeLevel);
+  const mNext = getMeleeWeaponData(Math.min(MAX_LEVEL, state.meleeLevel + 1));
+  const rCur = getRangedWeaponData(state.rangedLevel);
+  const rNext = getRangedWeaponData(Math.min(MAX_LEVEL, state.rangedLevel + 1));
+
+  // Update Active Weapon Selector Cards with Current Evolved Form & Icon
+  document.getElementById('activeMeleeImg').src = mCur.svgUrl;
+  document.getElementById('activeMeleeTitle').textContent = mCur.name;
+  document.getElementById('meleeDmgText').textContent = `Lv.${state.meleeLevel} Melee • ${state.meleeDamage} DMG`;
+
+  document.getElementById('activeRangedImg').src = rCur.svgUrl;
+  document.getElementById('activeRangedTitle').textContent = rCur.name;
+  document.getElementById('rangedDmgText').textContent = `Lv.${state.rangedLevel} Ranged • ${state.rangedDamage} DMG`;
+
+  // Update Melee Evolution Upgrade Card
+  const meleeMaxed = state.meleeLevel >= MAX_LEVEL;
+  document.getElementById('upgMeleeName').textContent = meleeMaxed ? `👑 ${mCur.name}` : `Evolve: ${mNext.name}`;
+  document.getElementById('upgMeleeLvl').textContent = meleeMaxed ? `MAX (${MAX_LEVEL})` : `Lv. ${state.meleeLevel} → ${state.meleeLevel + 1}`;
+  document.getElementById('upgMeleePreviewImg').src = mNext.svgUrl;
+  document.getElementById('upgMeleeDesc').textContent = meleeMaxed
+    ? `Max Evolution Reached! (${state.meleeDamage} DMG & Mythic Slash)`
+    : `+12 Melee DMG (${state.meleeDamage} → ${state.meleeDamage + 12}) & Bigger Impact Slash!`;
+  document.getElementById('upgMeleeCost').textContent = meleeMaxed ? `MAX LEVEL` : `🌻 ${state.meleeCost} Seeds`;
+  document.getElementById('upgMeleeBtn').disabled = meleeMaxed || state.gold < state.meleeCost;
+
+  // Update Ranged Evolution Upgrade Card
+  const rangedMaxed = state.rangedLevel >= MAX_LEVEL;
+  document.getElementById('upgRangedName').textContent = rangedMaxed ? `👑 ${rCur.name}` : `Evolve: ${rNext.name}`;
+  document.getElementById('upgRangedLvl').textContent = rangedMaxed ? `MAX (${MAX_LEVEL})` : `Lv. ${state.rangedLevel} → ${state.rangedLevel + 1}`;
+  document.getElementById('upgRangedPreviewImg').src = rNext.svgUrl;
+  document.getElementById('upgRangedDesc').textContent = rangedMaxed
+    ? `Max Evolution Reached! (${state.rangedDamage} DMG & Star Shot)`
+    : `+3 Ranged DMG (${state.rangedDamage} → ${state.rangedDamage + 3}) & Stronger Blast!`;
+  document.getElementById('upgRangedCost').textContent = rangedMaxed ? `MAX LEVEL` : `🌻 ${state.rangedCost} Seeds`;
+  document.getElementById('upgRangedBtn').disabled = rangedMaxed || state.gold < state.rangedCost;
+}
+
+// Start Adventure Button (Unlocks Web Speech & Web Audio API)
+document.getElementById('startAdventureBtn').addEventListener('click', () => {
+  initAudioAndVoice();
+  state.started = true;
+  document.getElementById('startOverlay').classList.add('hidden');
+  spawnEnemyForCurrentLevel();
+});
+
+// Clickable Warning Banner switches directly to Slingshot
+document.getElementById('weaponWarning').addEventListener('click', () => {
+  setWeapon('ranged');
+});
+
+document.getElementById('upgMeleeBtn').addEventListener('click', () => {
+  if (state.meleeLevel < MAX_LEVEL && state.gold >= state.meleeCost) {
+    state.gold -= state.meleeCost;
+    state.meleeLevel += 1;
+    state.meleeDamage += 12;
+    state.meleeCost = Math.round(state.meleeCost * 1.32);
+    const evolved = getMeleeWeaponData(state.meleeLevel);
+    addFloatingText(`⬆️ ${evolved.name}!`, state.playerX + 20, state.playerY - 75, evolved.slashColor);
+
+    const btn = document.getElementById('btnMelee');
+    btn.classList.add('evolved-pop');
+    setTimeout(() => btn.classList.remove('evolved-pop'), 320);
+
+    playEventTone('kill');
+    updateHUD();
+  }
+});
+
+document.getElementById('upgRangedBtn').addEventListener('click', () => {
+  if (state.rangedLevel < MAX_LEVEL && state.gold >= state.rangedCost) {
+    state.gold -= state.rangedCost;
+    state.rangedLevel += 1;
+    state.rangedDamage += 3;
+    state.rangedCost = Math.round(state.rangedCost * 1.3);
+    const evolved = getRangedWeaponData(state.rangedLevel);
+    addFloatingText(`⬆️ ${evolved.name}!`, state.playerX + 20, state.playerY - 75, evolved.projColor);
+
+    const btn = document.getElementById('btnRanged');
+    btn.classList.add('evolved-pop');
+    setTimeout(() => btn.classList.remove('evolved-pop'), 320);
+
+    playEventTone('kill');
+    updateHUD();
+  }
+});
+
+document.getElementById('btnMelee').addEventListener('click', () => setWeapon('melee'));
+document.getElementById('btnRanged').addEventListener('click', () => setWeapon('ranged'));
+
+document.getElementById('speakAgainBtn').addEventListener('click', () => {
+  if (state.enemy) triggerExpressiveVoice(state.enemy.produce, 'attack');
+});
+
+document.getElementById('soundToggleBtn').addEventListener('click', (e) => {
+  state.soundEnabled = !state.soundEnabled;
+  e.target.textContent = state.soundEnabled ? "🔊 Voice & Sound: ON" : "🔇 Voice & Sound: OFF";
+  if (!state.soundEnabled && 'speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    state.isBusySpeaking = false;
+  }
+});
+
+document.getElementById('playAgainBtn').addEventListener('click', () => {
+  state.level = 1;
+  state.treesGrown = 0;
+  state.isVictory = false;
+  state.produceCursor = 0;
+  document.getElementById('victoryOverlay').classList.remove('show');
+  spawnEnemyForCurrentLevel();
+});
+
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (!state.started) {
+      document.getElementById('startAdventureBtn').click();
+    } else {
+      toggleWeapon();
+    }
+  }
+});
+
+// --- 8. MAIN GAME LOOP & RENDERING ---
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let lastTime = performance.now();
+
+function updateGame(dt) {
+  // Drift Clouds
+  for (const c of state.clouds) {
+    c.x -= c.speed * dt;
+    if (c.x < -80) c.x = canvas.width + 60;
+  }
+
+  if (!state.started) return;
+
+  // Safety timeout release for speech lock (in case browser TTS doesn't fire onend)
+  if (state.isBusySpeaking) {
+    state.busySafetyTimerMs -= dt * 1000;
+    if (state.busySafetyTimerMs <= 0) {
+      state.isBusySpeaking = false;
+    }
+  }
+
+  // Respawn timer between defeated enemy and next enemy
+  if (!state.enemy && !state.isVictory) {
+    // Wait until the celebratory "Yay! <Produce> tree!" speech finishes AND respawnTimer expires
+    state.respawnTimer -= dt;
+    if (state.respawnTimer <= 0 && !state.isBusySpeaking) {
+      spawnEnemyForCurrentLevel();
+    }
+  }
+
+  // Weapon warning banner
+  const warnEl = document.getElementById('weaponWarning');
+  if (state.enemy && state.enemy.produce.isFlying && state.activeWeapon === 'melee') {
+    warnEl.style.display = 'block';
+  } else {
+    warnEl.style.display = 'none';
+  }
+
+  // Active Enemy Combat & Animation
+  if (state.enemy && !state.isVictory) {
+    // Only count down the post-speech pause AFTER the current spelling & word pronunciation finish!
+    // This ensures the attack pace is relaxed and never cuts off or rushes the spoken spelling.
+    if (state.projectiles.length === 0 && !state.isBusySpeaking) {
+      state.cooldownTimerMs += dt * 1000;
+      if (state.cooldownTimerMs >= state.postSpeechCooldownMs) {
+        state.cooldownTimerMs = 0;
+        performAttack();
+      }
+    }
+
+    // Re-check state.enemy because a melee performAttack() on the lethal hit sets state.enemy = null!
+    if (state.enemy) {
+      state.enemy.spawnScale = Math.min(1.0, state.enemy.spawnScale + dt * 3.8);
+      state.enemy.bobPhase += dt * (state.enemy.produce.isFlying ? 4.0 : 2.5);
+      const bobOffset = Math.sin(state.enemy.bobPhase) * (state.enemy.produce.isFlying ? 11 : 4);
+      state.enemy.y = state.enemy.baseY + bobOffset;
+
+      if (state.enemy.hitFlash > 0) {
+        state.enemy.hitFlash = Math.max(0, state.enemy.hitFlash - dt * 3.5);
+      }
+    }
+  }
+
+  if (state.swingAnim > 0) {
+    state.swingAnim = Math.max(0, state.swingAnim - dt * 3.5);
+  }
+
+  if (state.screenShake > 0) {
+    state.screenShake = Math.max(0, state.screenShake - dt * 28);
+  }
+
+  // Update Melee Slash Waves
+  for (let i = state.slashEffects.length - 1; i >= 0; i--) {
+    const sl = state.slashEffects[i];
+    sl.age += dt;
+    if (sl.age >= sl.maxAge) {
+      state.slashEffects.splice(i, 1);
+    }
+  }
+
+  // Update Impact Shockwaves
+  for (let i = state.shockwaves.length - 1; i >= 0; i--) {
+    const sw = state.shockwaves[i];
+    sw.radius += (sw.maxRadius - sw.radius) * Math.min(1, dt * 12);
+    sw.alpha -= dt * 2.8;
+    if (sw.alpha <= 0) {
+      state.shockwaves.splice(i, 1);
+    }
+  }
+
+  // Projectiles
+  for (let i = state.projectiles.length - 1; i >= 0; i--) {
+    const p = state.projectiles[i];
+    if (!state.enemy || p.targetEnemy !== state.enemy) {
+      state.projectiles.splice(i, 1);
+      continue;
+    }
+    const tx = state.enemy.x;
+    const ty = state.enemy.y - 10;
+    const dx = tx - p.x;
+    const dy = ty - p.y;
+    const dist = Math.hypot(dx, dy);
+
+    // Spawn trailing energy particles for upgraded projectiles!
+    if (p.level >= 2 && Math.random() < 0.65) {
+      state.particles.push({
+        x: p.x,
+        y: p.y,
+        vx: (Math.random() - 0.5) * 40,
+        vy: (Math.random() - 0.5) * 40,
+        radius: 2 + Math.min(5, p.level * 0.25),
+        color: p.color,
+        alpha: 0.75
+      });
+    }
+
+    if (dist < 22) {
+      applyDamageToEnemy(state.enemy, p.damage, 'ranged', p.level || state.rangedLevel);
+      state.projectiles.splice(i, 1);
+    } else {
+      p.x += (dx / dist) * p.speed * dt;
+      p.y += (dy / dist) * p.speed * dt;
+    }
+  }
+
+  // Particles
+  for (let i = state.particles.length - 1; i >= 0; i--) {
+    const pt = state.particles[i];
+    pt.x += pt.vx * dt;
+    pt.y += pt.vy * dt;
+    pt.vy += 360 * dt;
+    pt.alpha -= dt * 1.5;
+    if (pt.alpha <= 0) state.particles.splice(i, 1);
+  }
+
+  // Floating Texts
+  for (let i = state.floatingTexts.length - 1; i >= 0; i--) {
+    const ft = state.floatingTexts[i];
+    ft.y += ft.vy * dt;
+    ft.alpha -= dt * 0.85;
+    if (ft.alpha <= 0) state.floatingTexts.splice(i, 1);
+  }
+
+  // Positive Tree Sprouts
+  for (let i = state.trees.length - 1; i >= 0; i--) {
+    const tree = state.trees[i];
+    tree.age += dt;
+    if (tree.age >= tree.maxAge) {
+      state.trees.splice(i, 1);
+    }
+  }
+}
+
+function drawScene(now) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.save();
+  if (state.screenShake > 0.2) {
+    const sx = (Math.random() - 0.5) * state.screenShake * 2;
+    const sy = (Math.random() - 0.5) * state.screenShake * 2;
+    ctx.translate(sx, sy);
+  }
+
+  // Sky Gradient
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, 280);
+  skyGrad.addColorStop(0, "#caf0f8");
+  skyGrad.addColorStop(1, "#edf6f9");
+  ctx.fillStyle = skyGrad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Glowing Sun
+  ctx.fillStyle = "rgba(255, 209, 102, 0.3)";
+  ctx.beginPath();
+  ctx.arc(520, 62, 44, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#ffd166";
+  ctx.beginPath();
+  ctx.arc(520, 62, 30, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Clouds
+  ctx.fillStyle = "rgba(255, 255, 255, 0.88)";
+  for (const c of state.clouds) {
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.scale(c.scale, c.scale);
+    ctx.beginPath();
+    ctx.arc(0, 0, 20, 0, Math.PI * 2);
+    ctx.arc(18, -6, 24, 0, Math.PI * 2);
+    ctx.arc(38, 0, 18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Distant Hills
+  ctx.fillStyle = "#95d5b2";
+  ctx.beginPath();
+  ctx.arc(150, 295, 190, Math.PI, 0);
+  ctx.arc(460, 295, 220, Math.PI, 0);
+  ctx.fill();
+
+  // Foreground Meadow
+  ctx.fillStyle = "#52b788";
+  ctx.fillRect(0, 280, canvas.width, 90);
+  ctx.fillStyle = "#74c69d";
+  ctx.fillRect(0, 280, canvas.width, 14);
+
+  // Positive Defeat Trees
+  for (const tree of state.trees) {
+    drawHappyTree(tree);
+  }
+
+  // Hero Gardener
+  drawPlayer(now);
+
+  // Active Produce Enemy
+  if (state.enemy) {
+    drawEnemySprite(state.enemy, now);
+  }
+
+  // Impact Shockwave Rings
+  for (const sw of state.shockwaves) {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, sw.alpha);
+    ctx.strokeStyle = sw.color;
+    ctx.lineWidth = sw.lineWidth;
+    ctx.beginPath();
+    ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Melee Crescent Slash Waves
+  for (const sl of state.slashEffects) {
+    const prog = sl.age / sl.maxAge;
+    ctx.save();
+    ctx.translate(sl.x + prog * 28, sl.y);
+    ctx.globalAlpha = Math.max(0, 1 - prog);
+    ctx.strokeStyle = sl.color;
+    ctx.lineWidth = sl.thickness;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.arc(0, 0, sl.radius, -Math.PI * 0.42, Math.PI * 0.42);
+    ctx.stroke();
+
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = Math.max(2, sl.thickness * 0.4);
+    ctx.beginPath();
+    ctx.arc(2, 0, sl.radius * 0.92, -Math.PI * 0.32, Math.PI * 0.32);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Evolving Projectiles (Grow from Seeds -> Feathered Arrows -> Solar Bolts -> Cosmic Stars!)
+  for (const p of state.projectiles) {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+
+    // Outer Aura
+    ctx.fillStyle = p.glowColor || "rgba(255, 183, 3, 0.35)";
+    ctx.beginPath();
+    ctx.arc(0, 0, (p.radius || 7.5) * 1.6, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Main Projectile Core
+    ctx.fillStyle = p.color || "#ffb703";
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(0, 0, p.radius || 7.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Particles
+  for (const pt of state.particles) {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, pt.alpha);
+    ctx.fillStyle = pt.color;
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, pt.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Floating Texts
+  for (const ft of state.floatingTexts) {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, ft.alpha);
+    ctx.font = "900 18px 'Segoe UI', sans-serif";
+    ctx.fillStyle = ft.color;
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 4;
+    ctx.textAlign = "center";
+    ctx.strokeText(ft.text, ft.x, ft.y);
+    ctx.fillText(ft.text, ft.x, ft.y);
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+function drawPlayer(now) {
+  const walkBob = Math.sin(now / 180) * 2.5;
+  const px = state.playerX;
+  const py = state.playerY + walkBob;
+
+  ctx.save();
+  ctx.translate(px, py);
+
+  // Ground Shadow
+  ctx.fillStyle = "rgba(0,0,0,0.14)";
+  ctx.beginPath();
+  ctx.ellipse(0, 12 - walkBob, 26, 7, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Boots
+  ctx.fillStyle = "#6c584c";
+  ctx.beginPath();
+  ctx.roundRect(-14, 0, 11, 10, 4);
+  ctx.roundRect(3, 0, 11, 10, 4);
+  ctx.fill();
+
+  // Overalls & Red Shirt
+  ctx.fillStyle = "#e63946";
+  ctx.beginPath();
+  ctx.roundRect(-17, -34, 34, 34, 10);
+  ctx.fill();
+
+  ctx.fillStyle = "#1d3557";
+  ctx.beginPath();
+  ctx.roundRect(-15, -22, 30, 24, 8);
+  ctx.fill();
+
+  // Golden Overall Buttons
+  ctx.fillStyle = "#ffd166";
+  ctx.beginPath();
+  ctx.arc(-8, -18, 2.5, 0, Math.PI * 2);
+  ctx.arc(8, -18, 2.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Head
+  ctx.fillStyle = "#ffcdb2";
+  ctx.strokeStyle = "#1d3557";
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.arc(0, -50, 19, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Rosy Cheek & Eyes
+  ctx.fillStyle = "#ff758f";
+  ctx.beginPath();
+  ctx.ellipse(4, -46, 3.5, 2, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#1d3557";
+  ctx.beginPath();
+  ctx.arc(8, -52, 3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath();
+  ctx.arc(7, -53, 1.2, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Happy Smile
+  ctx.strokeStyle = "#1d3557";
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.arc(7, -45, 4, 0.1, Math.PI - 0.1);
+  ctx.stroke();
+
+  // Gardener Straw Hat with Green Ribbon
+  ctx.fillStyle = "#ffd166";
+  ctx.strokeStyle = "#b56576";
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.ellipse(0, -64, 30, 7, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(0, -65, 16, Math.PI, 0);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = "#2a9d8f";
+  ctx.fillRect(-15, -67, 30, 4);
+
+  // Equipped Farming Tool in Hand (Evolves Visually & Scales Up with Each Upgrade!)
+  ctx.save();
+  const swingAngle = Math.sin(state.swingAnim * Math.PI) * 1.18;
+  ctx.translate(12, -24);
+  ctx.rotate(swingAngle);
+
+  if (state.activeWeapon === 'melee') {
+    const m = getMeleeWeaponData(state.meleeLevel);
+    ctx.scale(m.scale, m.scale);
+
+    // Aura Glow for Upgraded Melee Farming Tools (Lv 3+)
+    if (state.meleeLevel >= 3) {
+      ctx.fillStyle = m.glowColor;
+      ctx.beginPath();
+      ctx.ellipse(24, 0, 22, 12, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    const mImg = WEAPON_SPRITE_CACHE.melee[state.meleeLevel];
+    if (mImg && mImg.complete) {
+      ctx.drawImage(mImg, -4, -26, 52, 52);
+    } else {
+      // Canvas Farming Tool Fallback (Handle + Tool Head)
+      ctx.fillStyle = m.handleColor;
+      ctx.fillRect(0, -3.5, 16, 7);
+      ctx.fillStyle = m.bladeColor;
+      ctx.strokeStyle = m.edgeColor;
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.roundRect(14, -10, 22, 20, 4);
+      ctx.fill();
+      ctx.stroke();
+    }
+  } else {
+    const r = getRangedWeaponData(state.rangedLevel);
+    ctx.scale(r.scale, r.scale);
+
+    if (state.rangedLevel >= 3) {
+      ctx.fillStyle = r.glowColor;
+      ctx.beginPath();
+      ctx.arc(20, -2, 19, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    const rImg = WEAPON_SPRITE_CACHE.ranged[state.rangedLevel];
+    if (rImg && rImg.complete) {
+      ctx.drawImage(rImg, -4, -26, 52, 52);
+    } else {
+      // Canvas Ranged Farming Tool Fallback
+      ctx.strokeStyle = r.frameColor;
+      ctx.lineWidth = 5;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(0, 8);
+      ctx.lineTo(12, -4);
+      ctx.lineTo(22, -15);
+      ctx.moveTo(12, -4);
+      ctx.lineTo(22, 5);
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+  ctx.restore();
+}
+
+function drawEnemySprite(enemy, now) {
+  const { produce, x, y, spawnScale, hitFlash, hp, maxHp } = enemy;
+  const spriteSet = SPRITE_CACHE[produce.id];
+
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(spawnScale, spawnScale);
+
+  // Ground Shadow
+  const shadowY = produce.isFlying ? (280 - y) : 24;
+  const shadowScale = produce.isFlying ? 0.65 : 1.0;
+  ctx.fillStyle = "rgba(0,0,0,0.14)";
+  ctx.beginPath();
+  ctx.ellipse(0, shadowY, 30 * shadowScale, 8 * shadowScale, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Animated Feathered Wings for Flying Fruits
+  if (produce.isFlying) {
+    const wingAngle = Math.sin(now / 65) * 0.35;
+    ctx.fillStyle = "#ffffff";
+    ctx.strokeStyle = "#3a86ff";
+    ctx.lineWidth = 2.5;
+
+    ctx.save();
+    ctx.translate(-32, -16);
+    ctx.rotate(-0.25 + wingAngle);
+    ctx.beginPath();
+    ctx.ellipse(-16, 0, 20, 10, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(32, -16);
+    ctx.rotate(0.25 - wingAngle);
+    ctx.beginPath();
+    ctx.ellipse(16, 0, 20, 10, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Draw High-Detail Kawaii SVG Sprite
+  const imgToDraw = hitFlash > 0.15 ? spriteSet.hit : spriteSet.normal;
+  if (imgToDraw && imgToDraw.complete) {
+    ctx.drawImage(imgToDraw, -52, -74, 104, 104);
+  }
+
+  // Nameplate & HP Bar above Enemy
+  const barW = 76;
+  const barH = 10;
+  const hpRatio = Math.max(0, hp / maxHp);
+
+  ctx.font = "800 12px 'Segoe UI', sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#1d3557";
+  ctx.fillText(`${produce.name} (${hp}/${maxHp})`, 0, -82);
+
+  ctx.fillStyle = "rgba(29, 53, 87, 0.8)";
+  ctx.beginPath();
+  ctx.roundRect(-barW / 2, -76, barW, barH, 5);
+  ctx.fill();
+
+  ctx.fillStyle = produce.isFlying ? "#3a86ff" : "#2a9d8f";
+  ctx.beginPath();
+  ctx.roundRect(-barW / 2 + 1.5, -74.5, (barW - 3) * hpRatio, barH - 3, 4);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawHappyTree(tree) {
+  const progress = tree.age / tree.maxAge;
+  const scale = progress < 0.25 ? (progress / 0.25) : 1.0;
+  let alpha = 1.0;
+  if (progress > 0.65) {
+    alpha = Math.abs(Math.sin(tree.age * 16)) * (1 - (progress - 0.65) / 0.35);
+  }
+
+  ctx.save();
+  ctx.translate(tree.x, tree.y);
+  ctx.scale(scale, scale);
+  ctx.globalAlpha = Math.max(0, alpha);
+
+  ctx.fillStyle = "#8d5524";
+  ctx.beginPath();
+  ctx.roundRect(-9, -48, 18, 52, 4);
+  ctx.fill();
+
+  ctx.fillStyle = "#2a9d8f";
+  ctx.beginPath();
+  ctx.arc(0, -70, 28, 0, Math.PI * 2);
+  ctx.arc(-20, -56, 22, 0, Math.PI * 2);
+  ctx.arc(20, -56, 22, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = tree.fruitColor;
+  const spots = [[-14, -60], [14, -62], [0, -78], [-6, -48], [10, -47]];
+  for (const [fx, fy] of spots) {
+    ctx.beginPath();
+    ctx.arc(fx, fy, 5.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.fillStyle = "#ffb703";
+  for (let i = 0; i < 4; i++) {
+    const angle = (tree.age * 3.0) + (i * Math.PI / 2);
+    const sx = Math.cos(angle) * 35;
+    const sy = -62 - (tree.age * 20) + Math.sin(angle) * 14;
+    ctx.beginPath();
+    ctx.arc(sx, sy, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+function gameLoop(now) {
+  const dt = Math.min(0.1, (now - lastTime) / 1000);
+  lastTime = now;
+
+  updateGame(dt);
+  drawScene(now);
+
+  requestAnimationFrame(gameLoop);
+}
+
+// Initialize Card Preview & Start Render Loop (waits for Start Adventure click to begin combat & voice)
+syncCardWithEnemy({ produce: PRODUCE_DB[0] });
+updateHUD();
+requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>
