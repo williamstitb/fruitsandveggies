@@ -72,10 +72,6 @@ Designed as a gentle, engaging learning experience for toddlers and young childr
 
 ---
 
-## 🚀 Deploying to GitHub Pages
+## 🚀 Deployment License
 
-Because the entire game is self-contained inside `index.html`:
-1. Push `index.html` and `README.md` to your GitHub repository.
-2. Go to **Settings → Pages** in your repository.
-3. Under **Build and deployment**, select **Deploy from a branch** and choose `main` (root `/`).
-4. Your game will be live and playable on any desktop, tablet, or phone!
+Apache 2.0 -- free to use and reuse with attributions
