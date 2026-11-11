@@ -13,6 +13,8 @@ Designed as a gentle, engaging learning experience for toddlers and young childr
 - Every time an attack lands, the fruit or vegetable **spells its name letter by letter** in lockstep with bouncing letter boxes and soft musical marimba chimes, followed by pronouncing the **complete word**.
 - Instead of negative defeat animations, every completed fruit or vegetable **sprouts into a happy fruit-bearing tree** with golden sparkles!
 
+As this is a self-contained html file, you can directly play the game in the github page here: https://github.com/williamstitb/fruitsandveggies
+
 ---
 
 ## ✨ Key Features
